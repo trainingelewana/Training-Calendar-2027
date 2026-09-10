@@ -1,0 +1,1214 @@
+<title>2027 Training Calendar</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  /* Palette drawn from the Elewana Collection brand identity (gold / warm cream / charcoal). */
+  :root{
+    color-scheme: light;
+    --page:#f7f6f3; --surface:#ffffff; --surface-2:#f0efed;
+    --text-primary:#2e2b28; --text-secondary:#6b6e6e; --muted:#8d9090;
+    --grid:#e8e8e7; --baseline:#d4d3d2; --border:rgba(46,43,40,0.13);
+    --accent:#bd9a5e; --accent-text:#7a5e2c; --accent-fg:#2e2b28; --accent-soft:#f5eee0; --accent-soft-border:#e3d2ac;
+    --good:#2f6b4f; --warning:#a9762e; --serious:#9c5a2e; --critical:#b5562b;
+    --slot1:#4f6f63; --slot2:#9c6b3f; --slot3:#5b7a94; --slot4:#8c5a3c; --slot5:#6e7d4f; --slot6:#7c6a8c;
+    --shadow: 0 1px 2px rgba(46,43,40,0.06), 0 6px 18px rgba(46,43,40,0.07);
+    --shadow-soft: 0 1px 2px rgba(46,43,40,0.05);
+    --shadow-hero: 0 2px 4px rgba(46,43,40,0.08), 0 14px 32px rgba(46,43,40,0.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --page:#1b1917; --surface:#242019; --surface-2:#2e2921;
+      --text-primary:#f2eee6; --text-secondary:#c9c0b0; --muted:#948c7d;
+      --grid:#34302a; --baseline:#433d34; --border:rgba(242,238,230,0.12);
+      --accent:#d4b580; --accent-text:#d9be8c; --accent-fg:#241d0f; --accent-soft:#332b1c; --accent-soft-border:#4a3d24;
+      --good:#5fa382; --warning:#c99a4c; --serious:#c2794a; --critical:#d07856;
+      --slot1:#6e9686; --slot2:#cc9558; --slot3:#86a3bc; --slot4:#b98268; --slot5:#9aa97a; --slot6:#a794b6;
+      --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 4px 18px rgba(0,0,0,0.35);
+      --shadow-soft: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-hero: 0 2px 6px rgba(0,0,0,0.45), 0 16px 36px rgba(0,0,0,0.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --page:#1b1917; --surface:#242019; --surface-2:#2e2921;
+    --text-primary:#f2eee6; --text-secondary:#c9c0b0; --muted:#948c7d;
+    --grid:#34302a; --baseline:#433d34; --border:rgba(242,238,230,0.12);
+    --accent:#d4b580; --accent-text:#d9be8c; --accent-fg:#241d0f; --accent-soft:#332b1c; --accent-soft-border:#4a3d24;
+    --good:#5fa382; --warning:#c99a4c; --serious:#c2794a; --critical:#d07856;
+    --slot1:#6e9686; --slot2:#cc9558; --slot3:#86a3bc; --slot4:#b98268; --slot5:#9aa97a; --slot6:#a794b6;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 4px 18px rgba(0,0,0,0.35);
+    --shadow-soft: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-hero: 0 2px 6px rgba(0,0,0,0.45), 0 16px 36px rgba(0,0,0,0.4);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--page); color:var(--text-primary);
+    font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 0 20px 64px;
+  }
+  h1,h2,h3,.brand{ font-family:"Cormorant Garamond", Georgia, serif; }
+  .wrap{ max-width: 1180px; margin: 0 auto; }
+
+  a{ color:var(--accent-text); }
+
+  /* ---------- header ---------- */
+  header{ padding-top:28px; }
+  .brandmark{ margin-bottom:22px; }
+  .brand-lockup{
+    display:inline-flex; align-items:center; gap:20px; padding:12px 22px; border-radius:10px;
+    background:transparent;
+  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .brand-lockup{ background:#fbfaf7; } }
+  :root[data-theme="dark"] .brand-lockup{ background:#fbfaf7; }
+  .brand-divider{ width:1px; align-self:stretch; background:rgba(46,43,40,0.16); }
+  .brand-logo{ height:31px; width:auto; display:block; }
+  .brand-logo-explorer{ height:26px; }
+  .eyebrow{
+    font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--accent-text); margin:0 0 6px;
+  }
+  h1{ font-size: clamp(28px,4.5vw,40px); font-weight:700; margin:0 0 6px; text-wrap:balance; letter-spacing:0;}
+  .subtitle{ color:var(--text-secondary); margin:0 0 18px; font-size:15px; max-width:62ch;}
+
+  .toolbar{
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:22px;
+  }
+  .pill{
+    display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600;
+    padding:5px 11px; border-radius:999px; border:1px solid var(--border); color:var(--text-secondary);
+    background:var(--surface);
+  }
+  .pill.live{ color:var(--good); border-color: color-mix(in srgb, var(--good) 40%, var(--border)); }
+  .pill.live .dot{ width:7px; height:7px; border-radius:50%; background:var(--good); }
+  .pill.snapshot{ color:var(--muted); }
+  .pill.snapshot .dot{ width:7px; height:7px; border-radius:50%; background:var(--muted); }
+  .toolbar .spacer{ flex:1; }
+  button.btn, a.btn{
+    font: inherit; font-size:13px; font-weight:600; cursor:pointer; text-decoration:none;
+    padding:8px 14px; border-radius:8px; border:1px solid var(--accent-soft-border);
+    background:var(--accent-soft); color:var(--accent-text); display:inline-flex; align-items:center; gap:6px;
+  }
+  button.btn:hover, a.btn:hover{ filter:brightness(0.97); }
+  button.btn:focus-visible, a.btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .banner{
+    display:none; margin-bottom:18px; padding:11px 14px; border-radius:10px; font-size:13.5px;
+    border:1px solid var(--accent-soft-border); background:var(--accent-soft); color:var(--text-primary);
+  }
+  .banner.show{ display:block; }
+  .banner.warn{ border-color: color-mix(in srgb, var(--warning) 50%, var(--border)); background: color-mix(in srgb, var(--warning) 14%, var(--surface)); }
+  .banner.error{ border-color: color-mix(in srgb, var(--critical) 45%, var(--border)); background: color-mix(in srgb, var(--critical) 12%, var(--surface)); }
+
+  /* ---------- KPIs ---------- */
+  .kpis{
+    display:grid; grid-template-columns:repeat(4,1fr); margin-bottom:28px;
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    box-shadow:var(--shadow); overflow:hidden;
+  }
+  @media (max-width:760px){
+    .kpis{ grid-template-columns:repeat(2,1fr);}
+    .kpi:nth-child(2n+1){ border-left:none; }
+    .kpi:nth-child(n+3){ border-top:1px solid var(--border); }
+  }
+  .kpi{
+    padding:18px 20px; border-left:1px solid var(--border);
+  }
+  .kpi:first-child{ border-left:none; }
+  .kpi .stat-label{
+    font-size:11.5px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+    display:flex; align-items:center; gap:6px;
+  }
+  .kpi.kpi-warn .stat-label::before{
+    content:""; width:6px; height:6px; border-radius:50%; background:var(--critical); flex:none;
+  }
+  .stat-value{ font-size:28px; font-weight:700; margin-top:7px; line-height:1.1; font-variant-numeric:tabular-nums; }
+  .kpi.kpi-warn .stat-value{ color:var(--critical); }
+  .kpi .stat-sub{ font-size:12.5px; color:var(--text-secondary); margin-top:5px; }
+
+  section{ margin-bottom:34px; }
+  .section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:12px; flex-wrap:wrap;}
+  h2{ font-size:19px; font-weight:700; margin:0; }
+  .section-note{ font-size:12.5px; color:var(--muted); }
+
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    box-shadow:var(--shadow-soft); padding:18px;
+  }
+
+  /* ---------- filters ---------- */
+  .filters-bar{
+    display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px 14px; margin-bottom:22px;
+    padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow);
+  }
+  .filter-field{ display:flex; flex-direction:column; gap:4px; min-width:148px; flex:1 1 148px; }
+  .filter-field label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+  .filter-field select{
+    font:inherit; font-size:13px; padding:7px 9px; border-radius:8px; border:1px solid var(--border);
+    background:var(--surface-2); color:var(--text-primary);
+  }
+  .filters-bar .btn{ flex:none; }
+  .filters-bar .section-note{ margin-left:auto; align-self:center; white-space:nowrap; }
+  @media (max-width:760px){ .filters-bar .section-note{ margin-left:0; width:100%; } }
+
+  /* ---------- category bars + overview ---------- */
+  .cat-overview{ display:grid; grid-template-columns: 1.3fr 1fr; gap:24px; align-items:start; }
+  @media (max-width:820px){ .cat-overview{ grid-template-columns:1fr; } }
+  .cat-grid{ display:grid; grid-template-columns: 1fr; gap:14px; }
+  .cat-row{ padding:2px 0; }
+  .cat-name{ font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .cat-swatch{ width:10px; height:10px; border-radius:3px; flex:none; }
+  .cat-track{ position:relative; height:10px; border-radius:6px; background:var(--grid); overflow:hidden; }
+  .cat-fill{ height:100%; border-radius:6px; position:relative; z-index:1; }
+  .cat-target{
+    position:absolute; top:0; bottom:0; z-index:0;
+    background: color-mix(in srgb, var(--text-primary) 12%, transparent);
+    border-left:1px dashed var(--muted); border-right:1px dashed var(--muted);
+  }
+  .cat-figure{ font-size:12px; color:var(--text-secondary); margin-top:5px; font-variant-numeric:tabular-nums; }
+  .legend-note{ font-size:12px; color:var(--muted); margin-top:14px; }
+
+  /* ---------- donut chart ---------- */
+  .donut-wrap{ display:flex; flex-direction:column; align-items:center; gap:16px; }
+  .donut{ position:relative; width:168px; height:168px; border-radius:50%; flex:none; box-shadow:var(--shadow); }
+  .donut::after{ content:""; position:absolute; inset:24%; border-radius:50%; background:var(--surface); z-index:0; }
+  .donut-center{
+    position:absolute; inset:0; z-index:1; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+  }
+  .donut-center .n{ font-size:22px; font-weight:700; line-height:1.1; }
+  .donut-center .lbl{ font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+  .donut-legend{ display:flex; flex-direction:column; gap:6px; width:100%; }
+  .donut-legend .row{ display:flex; align-items:center; gap:8px; font-size:12.5px; }
+  .donut-legend .row .swatch{ width:10px; height:10px; border-radius:3px; flex:none; }
+  .donut-legend .row .pct{ margin-left:auto; font-variant-numeric:tabular-nums; color:var(--text-secondary); }
+
+  .mini-table{ width:100%; border-collapse:collapse; font-size:12.5px; margin-top:16px; }
+  .mini-table th{
+    text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted);
+    font-weight:700; padding:0 6px 6px; border-bottom:1px solid var(--grid);
+  }
+  .mini-table td{ padding:6px; border-bottom:1px solid var(--grid); }
+  .mini-table tbody tr:last-child td{ border-bottom:none; }
+
+  /* ---------- year planner (hero gantt) ---------- */
+  .eyebrow.small{ margin:0 0 3px; font-size:11px; }
+  .planner-section{ margin-top:8px; }
+  .planner-card{
+    padding:22px 22px 16px; box-shadow:var(--shadow-hero);
+    border-top:3px solid var(--accent); border-radius:14px;
+  }
+  .gantt-legend{ display:flex; flex-wrap:wrap; gap:8px 16px; margin-bottom:8px; }
+  .legend-item{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--text-secondary); }
+  .legend-item .cat-swatch{ width:9px; height:9px; }
+  .status-legend{ display:flex; flex-wrap:wrap; gap:8px 16px; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--grid); }
+  .bar-sample{ display:inline-block; width:22px; height:10px; border-radius:3px; background-color:var(--accent); vertical-align:middle; }
+  .bar-sample.bar-planned{ background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.5) 0 4px, transparent 4px 8px); }
+  .bar-sample.bar-completed{ opacity:.6; }
+  .bar-sample.bar-cancelled{ background-color:transparent; border:1.5px dashed var(--muted); }
+  .gantt-scroll{ overflow-x:auto; }
+  .gantt{ min-width:920px; }
+  .gantt-months{ display:grid; grid-template-columns: 160px 1fr; margin-bottom:6px; }
+  .gantt-months .row-label{ }
+  .month-track{ display:flex; }
+  .month-cell{
+    flex:none; text-align:center; font-size:11.5px; font-weight:700; color:var(--text-secondary);
+    text-transform:uppercase; letter-spacing:.05em; border-left:1px solid var(--baseline); padding-bottom:8px;
+  }
+  .month-cell:first-child{ border-left:none; }
+  .month-cell.q-start{ border-left:2px solid var(--text-secondary); }
+  .gantt-body{ border-top:2px solid var(--baseline); }
+  .gantt-row{
+    display:grid; grid-template-columns: 160px 1fr; align-items:center;
+    border-bottom:1px solid var(--grid); min-height:36px;
+  }
+  .gantt-row:nth-child(even){ background: color-mix(in srgb, var(--surface-2) 55%, transparent); }
+  .gantt-row .row-label{
+    font-size:13px; font-weight:700; padding-right:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .gantt-row .row-label .country{ display:block; font-size:10.5px; font-weight:500; color:var(--muted); }
+  .track{
+    position:relative; height:36px;
+    background-image:
+      repeating-linear-gradient(to right, var(--baseline) 0, var(--baseline) 1.5px, transparent 1.5px, transparent calc(100%/12));
+  }
+  .bar{
+    position:absolute; top:50%; transform:translateY(-50%); height:15px; border-radius:3px; min-width:13px;
+    box-shadow: 0 0 0 2px var(--surface);
+    cursor:default;
+  }
+  .bar.bar-planned{ background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.5) 0 5px, transparent 5px 10px); }
+  .bar.bar-completed{ opacity:.6; }
+  .bar.bar-cancelled{
+    background-color:transparent !important; background-image:none !important;
+    border:1.5px dashed var(--muted); opacity:.75; box-shadow:none;
+  }
+  .track:has(.bar:hover) .bar:not(:hover){ opacity:.55; }
+  .bar-label{
+    position:absolute; top:50%; transform:translateY(-50%); font-size:11px; font-weight:600; color:var(--text-secondary);
+    white-space:nowrap; cursor:default; overflow:hidden; text-overflow:ellipsis;
+  }
+
+  @media print{
+    .toolbar .btn, .banner, .kpis, .filters-bar, section:has(#catGrid), section:has(#tableBody), section:has(#trainerBody){ display:none !important; }
+    body{ padding:0 8px; }
+    .planner-card{ box-shadow:none; border-color:#000; }
+    .gantt{ min-width:0; }
+  }
+
+  /* tooltip */
+  .tt{
+    position:fixed; z-index:20; pointer-events:none; max-width:260px;
+    background:var(--text-primary); color:var(--surface); font-size:12px; line-height:1.45;
+    padding:9px 11px; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.25);
+    opacity:0; transform:translateY(4px); transition:opacity .1s ease;
+  }
+  .tt.show{ opacity:1; }
+  .tt b{ display:block; margin-bottom:2px; }
+
+  /* ---------- table ---------- */
+  .table-scroll{ overflow-x:auto; }
+  table{ width:100%; border-collapse:collapse; font-size:13px; min-width:760px; }
+  th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted);
+    font-weight:700; padding:0 10px 8px; border-bottom:1px solid var(--grid); white-space:nowrap;
+  }
+  td{ padding:9px 10px; border-bottom:1px solid var(--grid); vertical-align:top; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:nth-child(even){ background: color-mix(in srgb, var(--surface-2) 45%, transparent); }
+  tr.conflict-row td{ background: color-mix(in srgb, var(--critical) 8%, transparent); }
+  .tag{
+    display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; white-space:nowrap;
+  }
+  .tag .cat-swatch{ width:8px; height:8px; }
+  .num{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .status-pill{
+    display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px;
+    background:var(--surface-2); color:var(--text-secondary); white-space:nowrap;
+  }
+  .status-pill.confirmed{ background: color-mix(in srgb, var(--good) 16%, var(--surface)); color:var(--good); }
+  .status-pill.completed{ background: var(--accent-soft); color:var(--accent-text); }
+  .status-pill.cancelled{ background: color-mix(in srgb, var(--critical) 14%, var(--surface)); color:var(--critical); }
+  .muted-cell{ color:var(--muted); }
+
+  footer{ margin-top:40px; padding-top:18px; border-top:1px solid var(--border); color:var(--muted); font-size:12.5px; line-height:1.7; }
+  footer a{ color:var(--text-secondary); }
+
+  .empty{ padding:26px; text-align:center; color:var(--muted); font-size:13.5px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brandmark">
+      <div class="brand-lockup">
+        <img class="brand-logo" src="data:image/png;base64,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" alt="Elewana Collection" />
+        <span class="brand-divider"></span>
+        <img class="brand-logo brand-logo-explorer" src="data:image/png;base64,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" alt="Explorer by Elewana" />
+      </div>
+    </div>
+    <p class="eyebrow">SafariCo Group &middot; Elewana Collection &amp; Explorer Collection</p>
+    <h1>2027 Training Calendar</h1>
+    <p class="subtitle">Group Learning &amp; Capability Development &mdash; live view of the 2027 training plan: dates, categories and people trained, drawn straight from the training log sheet.</p>
+    <div class="toolbar">
+      <span class="pill snapshot" id="statusPill"><span class="dot"></span><span id="statusText">Loading…</span></span>
+      <span class="section-note" id="updatedText"></span>
+      <span class="spacer"></span>
+      <button class="btn" id="refreshBtn" type="button">&#8635; Refresh</button>
+      <a class="btn" id="sheetLink" href="https://docs.google.com/spreadsheets/d/1A-_n39L-wzDXTiwc5DcsAqUSawKvEgg0Wvk_qP2YR48/edit" target="_blank" rel="noopener">Open training log &#8599;</a>
+    </div>
+    <div class="banner" id="banner"></div>
+  </header>
+
+  <div class="filters-bar" id="filtersBar">
+    <div class="filter-field">
+      <label for="fCountry">Country</label>
+      <select id="fCountry"><option value="">All countries</option></select>
+    </div>
+    <div class="filter-field">
+      <label for="fProperty">Hosting venue</label>
+      <select id="fProperty"><option value="">All venues</option></select>
+    </div>
+    <div class="filter-field">
+      <label for="fDepartment">Department</label>
+      <select id="fDepartment"><option value="">All departments</option></select>
+    </div>
+    <div class="filter-field">
+      <label for="fCategory">Category</label>
+      <select id="fCategory"><option value="">All categories</option></select>
+    </div>
+    <div class="filter-field">
+      <label for="fArea">Training type</label>
+      <select id="fArea"><option value="">All training types</option></select>
+    </div>
+    <div class="filter-field">
+      <label for="fStatus">Status</label>
+      <select id="fStatus"><option value="">All statuses</option></select>
+    </div>
+    <button class="btn" id="clearFiltersBtn" type="button">Clear filters</button>
+    <span class="section-note" id="filterSummary"></span>
+  </div>
+
+  <section class="planner-section">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow small">Year at a glance</p>
+        <h2>2027 Training Year Planner</h2>
+      </div>
+      <span class="section-note" id="ganttNote">Grouped by hosting venue across the year</span>
+    </div>
+    <div class="card planner-card">
+      <div class="gantt-legend" id="ganttLegend"></div>
+      <div class="status-legend">
+        <span class="legend-item"><span class="bar-sample bar-planned"></span>Planned</span>
+        <span class="legend-item"><span class="bar-sample bar-confirmed"></span>Confirmed</span>
+        <span class="legend-item"><span class="bar-sample bar-completed"></span>Completed</span>
+        <span class="legend-item"><span class="bar-sample bar-cancelled"></span>Cancelled</span>
+      </div>
+      <p class="legend-note" style="margin-top:-4px;">Rows group sessions by hosting venue; the training name is printed beside each bar so you don't need to hover to see what it is &mdash; hover a bar for exact dates, status and which properties are invited.</p>
+      <div class="gantt-scroll">
+        <div class="gantt" id="ganttWrap"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="kpis" id="kpis"></section>
+
+  <section>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow small">Policy GEN PROP-004</p>
+        <h2>Training by category</h2>
+      </div>
+      <span class="section-note">6 approved categories</span>
+    </div>
+    <div class="card">
+      <div class="cat-overview">
+        <div>
+          <div class="cat-grid" id="catGrid"></div>
+          <p class="legend-note">Shaded band = policy target share of sessions (a directional guide, not exact hours): coaching 40&ndash;50%, SOP 20&ndash;25% (min. 25%), toolbox talks &le;15%, online learning 10&ndash;15%; workshops and compliance are &ldquo;as required.&rdquo;</p>
+        </div>
+        <div>
+          <div id="catDonutWrap"></div>
+          <table class="mini-table">
+            <thead><tr><th>Category</th><th class="num">Hours scheduled</th><th class="num">Hours completed</th></tr></thead>
+            <tbody id="catHoursBody"></tbody>
+          </table>
+          <p class="legend-note">Hours = Individual Training Hrs &times; Attendees Planned per session. Sessions missing an attendee count aren't counted yet (flagged above). &ldquo;Completed&rdquo; counts Status = Completed only.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow small">All 2027 sessions</p>
+        <h2>Session detail</h2>
+      </div>
+      <span class="section-note" id="tableNote"></span>
+    </div>
+    <div class="card" style="padding:0;">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Hosting venue</th><th>Department</th><th>Category</th><th>Training name</th><th>Dates</th>
+              <th>Trainer</th><th class="num">Attendees</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow small">Travel-time check</p>
+        <h2>Trainer workload</h2>
+      </div>
+      <span class="section-note" id="trainerNote"></span>
+    </div>
+    <div class="card" style="padding:0;">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Trainer</th><th class="num">Sessions</th><th>Properties</th><th>Scheduled span</th></tr>
+          </thead>
+          <tbody id="trainerBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="legend-note">Flags a trainer with less than 3 days between finishing at one property and starting at another &mdash; a rough proxy for travel time between properties; use your own judgement for properties that are close together.</p>
+  </section>
+
+  <footer>
+    <p><strong>How this works:</strong> add or edit rows on the <a href="https://docs.google.com/spreadsheets/d/1A-_n39L-wzDXTiwc5DcsAqUSawKvEgg0Wvk_qP2YR48/edit" target="_blank" rel="noopener">2027 Group Training Plan</a> sheet (Training Log 2027 tab) as dates are confirmed through the year &mdash; this page re-reads it automatically. Fill in &ldquo;Attendees Trained&rdquo; once a session has actually happened; that's what powers the people-trained totals above.</p>
+    <p>Kenya compliance dates (Fire Safety / Occupational Health &amp; Safety / First Aid, Feb&ndash;Mar 2027) are from the 2027 Training Budget workbook and marked <em>Planned</em> since they are suggested dates, not yet confirmed. Tanzania OSHA compliance dates follow the OSHA Annual OHS Training Calendar; a few still need exact dates confirmed in WIMS and show as &ldquo;Date TBC&rdquo; below until added. The other five approved categories (on-the-job coaching, SOP training, toolbox talks, online learning, workshops/formal sessions) are still to be added as they're scheduled.</p>
+    <p>Source: Group Learning &amp; Capability Development Policy (effective 11 Mar 2026) and SOP GEN PROP-004 (v01, 11 Mar 2026).</p>
+  </footer>
+</div>
+
+<div class="tt" id="tooltip"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  // This build reads a small Apps Script feed (published from the same
+  // Google Sheet) instead of claude.ai's Google Drive connector, so it works
+  // for anyone with the link -- no Claude account needed. See SETUP_GUIDE.md
+  // for how the feed is set up. Paste your deployed Web App's /exec URL below.
+  var WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyv5kbNXC2Pl2SolhcOkkCunSvtm-a4K43_CYk5AgDPKx1k9gnjH_ioXi70KaukWtZL/exec";
+  var REFRESH_MS = 300000; // 5 minutes
+  var YEAR = 2027;
+  var YEAR_START = Date.UTC(YEAR,0,1);
+  var YEAR_DAYS = (Date.UTC(YEAR,11,31) - YEAR_START)/86400000 + 1; // 365
+
+  // min/max = policy's target share of annual hours for that category (GEN PROP-004).
+  // Categories with no fixed target (workshops, compliance) simply omit them.
+  var CATEGORIES = [
+    {name:"On-the-job coaching", slotVar:"--slot1", min:40, max:50},
+    {name:"SOP training", slotVar:"--slot2", min:20, max:25},
+    {name:"Toolbox talks", slotVar:"--slot3", min:0, max:15},
+    {name:"Online learning", slotVar:"--slot4", min:10, max:15},
+    {name:"Workshops / Formal sessions", slotVar:"--slot5"},
+    {name:"Compliance training", slotVar:"--slot6"}
+  ];
+  var CAT_COLOR = {}, CAT_META = {};
+  CATEGORIES.forEach(function(c){ CAT_COLOR[c.name] = c.slotVar; CAT_META[c.name] = c; });
+  var FALLBACK_COLOR = "--muted";
+
+  // Real starting data: 2027 Kenya compliance dates from the "2027 Training Budget" workbook,
+  // pre-loaded into the Training Log sheet. Shown at rest until the live sheet connects.
+  var FALLBACK_ROWS = [{"Session ID": "KE-001", "Hosting Property": "SRM", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Fire Safety", "Participating Property": "SRM", "Start Date": "01-Feb-2027", "End Date": "02-Feb-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "63", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "441", "Budget (USD)": "$60,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-002", "Hosting Property": "SRM", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "First Aid", "Participating Property": "SRM", "Start Date": "01-Feb-2027", "End Date": "02-Feb-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "63", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "441", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-005", "Hosting Property": "EPC", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Fire Safety", "Participating Property": "EPC", "Start Date": "05-Feb-2027", "End Date": "06-Feb-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "41", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "287", "Budget (USD)": "$60,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-006", "Hosting Property": "EPC", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "First Aid", "Participating Property": "EPC", "Start Date": "05-Feb-2027", "End Date": "06-Feb-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "41", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "287", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-009", "Hosting Property": "TCA", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Fire Safety", "Participating Property": "TCA", "Start Date": "11-Feb-2027", "End Date": "12-Feb-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "71", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "497", "Budget (USD)": "$60,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-010", "Hosting Property": "TCA", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "First Aid", "Participating Property": "TCA", "Start Date": "11-Feb-2027", "End Date": "12-Feb-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "71", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "497", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-011", "Hosting Property": "EKM", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Fire Safety", "Participating Property": "EKM", "Start Date": "15-Feb-2027", "End Date": "16-Feb-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "50", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "350", "Budget (USD)": "$60,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-012", "Hosting Property": "EKM", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "First Aid", "Participating Property": "EKM", "Start Date": "15-Feb-2027", "End Date": "16-Feb-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "50", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "350", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-015", "Hosting Property": "LSC", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Fire Safety", "Participating Property": "LSC", "Start Date": "23-Feb-2027", "End Date": "24-Feb-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "52", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "364", "Budget (USD)": "$60,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-016", "Hosting Property": "LSC", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "First Aid", "Participating Property": "LSC", "Start Date": "23-Feb-2027", "End Date": "24-Feb-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "52", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "364", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-017", "Hosting Property": "KHL", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Fire Safety", "Participating Property": "KHL", "Start Date": "25-Feb-2027", "End Date": "26-Feb-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "21", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "147", "Budget (USD)": "$60,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-018", "Hosting Property": "KHL", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "First Aid", "Participating Property": "KHL", "Start Date": "25-Feb-2027", "End Date": "26-Feb-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "21", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "147", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-019", "Hosting Property": "LTC", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Occupational Health & Safety", "Participating Property": "LTC", "Start Date": "02-Mar-2027", "End Date": "04-Mar-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "50", "Attendees Trained": "", "Individual Training Hrs": "14", "Total Training Hrs": "700", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-020", "Hosting Property": "LTC", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "First Aid", "Participating Property": "LTC", "Start Date": "02-Mar-2027", "End Date": "04-Mar-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "50", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "350", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-021", "Hosting Property": "LSB", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Occupational Health & Safety", "Participating Property": "LSB", "Start Date": "02-Mar-2027", "End Date": "04-Mar-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "9", "Attendees Trained": "", "Individual Training Hrs": "14", "Total Training Hrs": "126", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-022", "Hosting Property": "LSB", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "First Aid", "Participating Property": "LSB", "Start Date": "02-Mar-2027", "End Date": "04-Mar-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "9", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "63", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-023", "Hosting Property": "LLS", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Occupational Health & Safety", "Participating Property": "LLS", "Start Date": "02-Mar-2027", "End Date": "04-Mar-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "30", "Attendees Trained": "", "Individual Training Hrs": "14", "Total Training Hrs": "420", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-024", "Hosting Property": "LLS", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "First Aid", "Participating Property": "LLS", "Start Date": "02-Mar-2027", "End Date": "04-Mar-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "30", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "210", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "⚠ Possible double-booking — check dates"}, {"Session ID": "KE-029", "Hosting Property": "KE Head Office", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "First Aid", "Participating Property": "Nairobi Office", "Start Date": "12-Mar-2027", "End Date": "12-Mar-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "OK"}, {"Session ID": "KE-030", "Hosting Property": "Workshop", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "First Aid", "Participating Property": "WKSHP KE", "Start Date": "19-Mar-2027", "End Date": "19-Mar-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "OK"}, {"Session ID": "KE-031", "Hosting Property": "KE Central Stores", "Country": "Kenya", "Department": "All Departments", "Category": "Compliance training", "Training Area": "First Aid", "Participating Property": "Nairobi Office", "Start Date": "19-Mar-2027", "End Date": "19-Mar-2027", "Trainer / Facilitator": "St Johns", "Attendees Planned": "", "Attendees Trained": "", "Individual Training Hrs": "7", "Total Training Hrs": "", "Budget (USD)": "$50,000", "Status": "Planned", "Notes": "Suggested date from 2027 Training Budget — confirm before locking calendar", "Scheduling Conflict": "OK"}, {"Session ID": "TZ-001", "Hosting Property": "Arusha", "Country": "Tanzania", "Department": "All Departments", "Category": "Compliance training", "Training Area": "National Occupational Safety & Health Course (NOSHC) Module I", "Participating Property": "ALL", "Start Date": "03/06/2027", "End Date": "15/06/2027", "Trainer / Facilitator": "OSHA Tanzania", "Attendees Planned": "2", "Attendees Trained": "", "Individual Training Hrs": "90", "Total Training Hrs": "180", "Budget (USD)": "", "Status": "Planned", "Notes": "OSHA Annual OHS Training Calendar Jul 2026-Jun 2027; Arusha. Confirm in WIMS before booking as OSHA may review the calendar quarterly.", "Scheduling Conflict": "OK"}, {"Session ID": "TZ-002", "Hosting Property": "Karatu", "Country": "Tanzania", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Occupational Safety and Health Representatives Training", "Participating Property": "ALL", "Start Date": "26/01/2027", "End Date": "29/01/2027", "Trainer / Facilitator": "OSHA Tanzania", "Attendees Planned": "", "Attendees Trained": "", "Individual Training Hrs": "30", "Total Training Hrs": "", "Budget (USD)": "", "Status": "Planned", "Notes": "OSHA Annual OHS Training Calendar July 2026-Jun 2027; Northern Zone/Karatu. Confirm in WIMS before booking as OSHA may review the calendar quarterly.", "Scheduling Conflict": "OK"}, {"Session ID": "TZ-003", "Hosting Property": "Arusha", "Country": "Tanzania", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Occupational Safety and Health Representatives Training", "Participating Property": "ALL", "Start Date": "16/02/2027", "End Date": "19/02/2027", "Trainer / Facilitator": "OSHA Tanzania", "Attendees Planned": "", "Attendees Trained": "", "Individual Training Hrs": "30", "Total Training Hrs": "", "Budget (USD)": "", "Status": "Planned", "Notes": "OSHA Annual OHS Training Calendar Jul 2026-Jun 2027; Northern Zone/Arusha. Confirm in WIMS before booking as OSHA may review the calendar quarterly.", "Scheduling Conflict": "OK"}, {"Session ID": "TZ-004", "Hosting Property": "Moshi", "Country": "Tanzania", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Occupational Safety and Health Representatives Training", "Participating Property": "ALL", "Start Date": "16/03/2027", "End Date": "19/03/2027", "Trainer / Facilitator": "OSHA Tanzania", "Attendees Planned": "", "Attendees Trained": "", "Individual Training Hrs": "30", "Total Training Hrs": "", "Budget (USD)": "", "Status": "Planned", "Notes": "OSHA Annual OHS Training Calendar Jul 2026-Jun 2027; Northern Zone/Moshi. Confirm in WIMS before booking as OSHA may review the calendar quarterly.", "Scheduling Conflict": "OK"}, {"Session ID": "TZ-005", "Hosting Property": "Babati", "Country": "Tanzania", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Occupational Safety and Health Representatives Training", "Participating Property": "ALL", "Start Date": "18/04/2027", "End Date": "21/04/2027", "Trainer / Facilitator": "OSHA Tanzania", "Attendees Planned": "", "Attendees Trained": "", "Individual Training Hrs": "30", "Total Training Hrs": "", "Budget (USD)": "", "Status": "Planned", "Notes": "OSHA Annual OHS Training Calendar Jul 2026-Jun 2027; Northern Zone/Babati. Confirm in WIMS before booking as OSHA may review the calendar quarterly.", "Scheduling Conflict": "OK"}, {"Session ID": "TZ-006", "Hosting Property": "Arusha", "Country": "Tanzania", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Occupational Safety and Health Representatives Training", "Participating Property": "ALL", "Start Date": "24/05/2027", "End Date": "27/05/2027", "Trainer / Facilitator": "OSHA Tanzania", "Attendees Planned": "", "Attendees Trained": "", "Individual Training Hrs": "30", "Total Training Hrs": "", "Budget (USD)": "", "Status": "Planned", "Notes": "OSHA Annual OHS Training Calendar Jul 2026-Jun 2027; Northern Zone/Arusha. Confirm in WIMS before booking as OSHA may review the calendar quarterly.", "Scheduling Conflict": "OK"}, {"Session ID": "TZ-007", "Hosting Property": "Moshi", "Country": "Tanzania", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Occupational Safety and Health Representatives Training", "Participating Property": "ALL", "Start Date": "15/06/2027", "End Date": "18/06/2027", "Trainer / Facilitator": "OSHA Tanzania", "Attendees Planned": "", "Attendees Trained": "", "Individual Training Hrs": "30", "Total Training Hrs": "", "Budget (USD)": "", "Status": "Planned", "Notes": "OSHA Annual OHS Training Calendar Jul 2026-Jun 2027; Northern Zone/Moshi. Confirm in WIMS before booking as OSHA may review the calendar quarterly.", "Scheduling Conflict": "OK"}, {"Session ID": "TZ-008", "Hosting Property": "Moshi", "Country": "Tanzania", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Industrial First Aid Training", "Participating Property": "ALL", "Start Date": "03/01/2027", "End Date": "05/01/2027", "Trainer / Facilitator": "OSHA Tanzania", "Attendees Planned": "", "Attendees Trained": "", "Individual Training Hrs": "22.5", "Total Training Hrs": "", "Budget (USD)": "", "Status": "Planned", "Notes": "OSHA Annual OHS Training Calendar Jul 2026-Jun 2027; Northern Zone/Moshi. Confirm in WIMS before booking as OSHA may review the calendar quarterly.", "Scheduling Conflict": "OK"}, {"Session ID": "TZ-009", "Hosting Property": "Babati", "Country": "Tanzania", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Industrial First Aid Training", "Participating Property": "ALL", "Start Date": "07/02/2027", "End Date": "09/02/2027", "Trainer / Facilitator": "OSHA Tanzania", "Attendees Planned": "", "Attendees Trained": "", "Individual Training Hrs": "22.5", "Total Training Hrs": "", "Budget (USD)": "", "Status": "Planned", "Notes": "OSHA Annual OHS Training Calendar Jul 2026-Jun 2027; Northern Zone/Babati. Confirm in WIMS before booking as OSHA may review the calendar quarterly.", "Scheduling Conflict": "OK"}, {"Session ID": "TZ-010", "Hosting Property": "Arusha", "Country": "Tanzania", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Industrial First Aid Training", "Participating Property": "ALL", "Start Date": "21/03/2027", "End Date": "23/03/2027", "Trainer / Facilitator": "OSHA Tanzania", "Attendees Planned": "", "Attendees Trained": "", "Individual Training Hrs": "22.5", "Total Training Hrs": "", "Budget (USD)": "", "Status": "Planned", "Notes": "OSHA Annual OHS Training Calendar Jul 2026-Jun 2027; Northern Zone/Arusha. Confirm in WIMS before booking as OSHA may review the calendar quarterly.", "Scheduling Conflict": "OK"}, {"Session ID": "TZ-011", "Hosting Property": "Moshi", "Country": "Tanzania", "Department": "All Departments", "Category": "Compliance training", "Training Area": "Industrial First Aid Training", "Participating Property": "ALL", "Start Date": "09/06/2027", "End Date": "11/06/2027", "Trainer / Facilitator": "OSHA Tanzania", "Attendees Planned": "", "Attendees Trained": "", "Individual Training Hrs": "22.5", "Total Training Hrs": "", "Budget (USD)": "", "Status": "Planned", "Notes": "OSHA Annual OHS Training Calendar Jul 2026-Jun 2027; Northern Zone/Moshi. Confirm in WIMS before booking as OSHA may review the calendar quarterly.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-001", "Hosting Property": "Tarangire Treetops", "Country": "Tanzania", "Department": "Food & Beverage", "Category": "Workshops / Formal sessions", "Training Area": "Beverage Intelligence Supplier Training", "Participating Property": "ALL", "Start Date": "06/04/2027", "End Date": "09/04/2027", "Trainer / Facilitator": "Beverage Intelligence", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "28", "Total Training Hrs": "336", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — supplier training. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-002", "Hosting Property": "Serengeti Explorer", "Country": "Tanzania", "Department": "Food & Beverage", "Category": "Workshops / Formal sessions", "Training Area": "Beverage Intelligence Supplier Training", "Participating Property": "ALL", "Start Date": "11/04/2027", "End Date": "14/04/2027", "Trainer / Facilitator": "Beverage Intelligence", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "28", "Total Training Hrs": "336", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — supplier training. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-003", "Hosting Property": "Lewa Safari Camp", "Country": "Kenya", "Department": "Food & Beverage", "Category": "Workshops / Formal sessions", "Training Area": "Beverage Intelligence Supplier Training", "Participating Property": "ALL", "Start Date": "18/04/2027", "End Date": "21/04/2027", "Trainer / Facilitator": "Beverage Intelligence", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "28", "Total Training Hrs": "336", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — supplier training. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-004", "Hosting Property": "Loisaba Tented Camp", "Country": "Kenya", "Department": "Food & Beverage", "Category": "Workshops / Formal sessions", "Training Area": "Beverage Intelligence Supplier Training", "Participating Property": "ALL", "Start Date": "23/04/2027", "End Date": "26/04/2027", "Trainer / Facilitator": "Beverage Intelligence", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "28", "Total Training Hrs": "336", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — supplier training. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-005", "Hosting Property": "Tortilis Camp", "Country": "Kenya", "Department": "Food & Beverage", "Category": "Workshops / Formal sessions", "Training Area": "Beverage Intelligence Supplier Training", "Participating Property": "ALL", "Start Date": "28/04/2027", "End Date": "01/05/2027", "Trainer / Facilitator": "Beverage Intelligence", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "28", "Total Training Hrs": "336", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — supplier training. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-006", "Hosting Property": "Tarangire Treetops", "Country": "Tanzania", "Department": "Food & Beverage", "Category": "Workshops / Formal sessions", "Training Area": "Barista Training", "Participating Property": "ALL", "Start Date": "20/04/2027", "End Date": "22/04/2027", "Trainer / Facilitator": "Barista Trainer", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "21", "Total Training Hrs": "252", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — Tanzania only. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-007", "Hosting Property": "Serengeti Explorer", "Country": "Tanzania", "Department": "Food & Beverage", "Category": "Workshops / Formal sessions", "Training Area": "Barista Training", "Participating Property": "ALL", "Start Date": "24/04/2027", "End Date": "26/04/2027", "Trainer / Facilitator": "Barista Trainer", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "21", "Total Training Hrs": "252", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — Tanzania only. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-008", "Hosting Property": "Tarangire Treetops", "Country": "Tanzania", "Department": "Spa & Wellness", "Category": "Workshops / Formal sessions", "Training Area": "Healing Earth Supplier Training", "Participating Property": "ALL", "Start Date": "04/05/2027", "End Date": "06/05/2027", "Trainer / Facilitator": "Healing Earth - Alida", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "21", "Total Training Hrs": "252", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — supplier training. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-009", "Hosting Property": "Serengeti Explorer", "Country": "Tanzania", "Department": "Spa & Wellness", "Category": "Workshops / Formal sessions", "Training Area": "Healing Earth Supplier Training", "Participating Property": "ALL", "Start Date": "08/05/2027", "End Date": "10/05/2027", "Trainer / Facilitator": "Healing Earth - Alida", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "21", "Total Training Hrs": "252", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — supplier training. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-010", "Hosting Property": "Lewa Safari Camp", "Country": "Kenya", "Department": "Spa & Wellness", "Category": "Workshops / Formal sessions", "Training Area": "Healing Earth Supplier Training", "Participating Property": "ALL", "Start Date": "14/05/2027", "End Date": "16/05/2027", "Trainer / Facilitator": "Healing Earth - Alida", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "21", "Total Training Hrs": "252", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — supplier training. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-011", "Hosting Property": "Loisaba Tented Camp", "Country": "Kenya", "Department": "Spa & Wellness", "Category": "Workshops / Formal sessions", "Training Area": "Healing Earth Supplier Training", "Participating Property": "ALL", "Start Date": "18/05/2027", "End Date": "20/05/2027", "Trainer / Facilitator": "Healing Earth - Alida", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "21", "Total Training Hrs": "252", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — supplier training. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-012", "Hosting Property": "Tortilis Camp", "Country": "Kenya", "Department": "Spa & Wellness", "Category": "Workshops / Formal sessions", "Training Area": "Healing Earth Supplier Training", "Participating Property": "ALL", "Start Date": "22/05/2027", "End Date": "24/05/2027", "Trainer / Facilitator": "Healing Earth - Alida", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "21", "Total Training Hrs": "252", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — supplier training. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-013", "Hosting Property": "Tarangire Treetops", "Country": "Tanzania", "Department": "Spa & Wellness", "Category": "Workshops / Formal sessions", "Training Area": "Cleo - Technical Spa Training", "Participating Property": "ALL", "Start Date": "13/04/2027", "End Date": "16/04/2027", "Trainer / Facilitator": "Cleo Drummond", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "28", "Total Training Hrs": "336", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — technical spa supplier training. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-014", "Hosting Property": "Serengeti Explorer", "Country": "Tanzania", "Department": "Spa & Wellness", "Category": "Workshops / Formal sessions", "Training Area": "Cleo - Technical Spa Training", "Participating Property": "ALL", "Start Date": "18/04/2027", "End Date": "21/04/2027", "Trainer / Facilitator": "Cleo Drummond", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "28", "Total Training Hrs": "336", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — technical spa supplier training. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-015", "Hosting Property": "Lewa Safari Camp", "Country": "Kenya", "Department": "Spa & Wellness", "Category": "Workshops / Formal sessions", "Training Area": "Cleo - Technical Spa Training", "Participating Property": "ALL", "Start Date": "25/04/2027", "End Date": "28/04/2027", "Trainer / Facilitator": "Cleo Drummond", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "28", "Total Training Hrs": "336", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — technical spa supplier training. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "SUP-016", "Hosting Property": "Tortilis Camp", "Country": "Kenya", "Department": "Spa & Wellness", "Category": "Workshops / Formal sessions", "Training Area": "Cleo - Technical Spa Training", "Participating Property": "ALL", "Start Date": "30/04/2027", "End Date": "03/05/2027", "Trainer / Facilitator": "Cleo Drummond", "Attendees Planned": "12", "Attendees Trained": "", "Individual Training Hrs": "28", "Total Training Hrs": "336", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — technical spa supplier training; Cleo itinerary skips Loisaba. Venue is the training hub; team members travel in. Reconfirm against live occupancy before final booking.", "Scheduling Conflict": "OK"}, {"Session ID": "GM-001", "Hosting Property": "SXR", "Country": "Tanzania", "Department": "All Departments", "Category": "Workshops / Formal sessions", "Training Area": "GM Conference 2027", "Participating Property": "ALL", "Start Date": "15/03/2027", "End Date": "18/03/2027", "Trainer / Facilitator": "TBC", "Attendees Planned": "41", "Attendees Trained": "", "Individual Training Hrs": "14", "Total Training Hrs": "574", "Budget (USD)": "", "Status": "Planned", "Notes": "PRELIMINARY — GM Conference hosted at Serengeti Explorer. Travel/arrival 15 Mar; conference sessions 16–17 Mar (2 full days × 7 hrs); departure 18 Mar. 41 planned attendees based on current GM Conference 2027 SXR participant selection. Reconfirm SXR and attending-property occupancy before final booking.", "Scheduling Conflict": "OK"}];
+
+  var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  function esc(s){
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function num(v){ var n = parseFloat(v); return isFinite(n) ? n : 0; }
+  function uniqList(arr){
+    var seen = {}, out = [];
+    arr.forEach(function(v){ if(v && !seen[v]){ seen[v] = true; out.push(v); } });
+    return out;
+  }
+  function truncateLabel(s, max){
+    s = String(s == null ? "" : s);
+    return s.length > max ? s.slice(0, max - 1) + "…" : s;
+  }
+  function fmtMoney(n){ return "$" + Math.round(n).toLocaleString("en-US"); }
+  function fmtDate(d){
+    if(!d) return "";
+    return d.toLocaleDateString("en-GB", {day:"numeric", month:"short", timeZone:"UTC"});
+  }
+  var MON3 = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  // Handles the date formats actually found in the sheet: ISO "YYYY-MM-DD",
+  // "DD-Mon-YYYY" (e.g. "01-Feb-2027"), and "DD/MM/YYYY" (e.g. "03/06/2027").
+  // Blank or unrecognized values return null (treated as "date TBC") rather
+  // than throwing or silently producing an invalid date.
+  function parseUTC(s){
+    if(s == null) return null;
+    s = String(s).trim();
+    if(!s) return null;
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s);
+    if(m){
+      var d1 = new Date(Date.UTC(+m[1], +m[2]-1, +m[3]));
+      return isNaN(d1.getTime()) ? null : d1;
+    }
+    m = /^(\d{1,2})-([A-Za-z]{3,})-(\d{4})$/.exec(s);
+    if(m){
+      var mon = MON3[m[2].slice(0,3).toLowerCase()];
+      if(mon === undefined) return null;
+      var d2 = new Date(Date.UTC(+m[3], mon, +m[1]));
+      return isNaN(d2.getTime()) ? null : d2;
+    }
+    m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s);
+    if(m){
+      // Sheet dates are entered day-first (e.g. 03/06/2027 = 3 June 2027).
+      var d3 = new Date(Date.UTC(+m[3], +m[2]-1, +m[1]));
+      return isNaN(d3.getTime()) ? null : d3;
+    }
+    return null;
+  }
+  function dayOfYear(d){ return Math.round((Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - YEAR_START) / 86400000); }
+
+  // ---------- parsing the sheet's markdown-table text representation ----------
+  // Observed shapes vary: sometimes the sheet's real header is line 1 (then an
+  // alignment separator, then data); sometimes the tool prepends a blank
+  // pseudo-header line before the alignment separator and the real header.
+  // Rather than assume a fixed line count, find the row that actually
+  // contains "Session ID" and treat that as the header, skipping any
+  // alignment-separator rows (cells made only of "-"/":" dashes) wherever
+  // they fall.
+  function parseMarkdownTable(text){
+    if(typeof text !== "string") return null;
+    // A multi-tab file (like Winnie's own workbook) comes back as several
+    // markdown tables concatenated together, one per tab, separated by
+    // blank lines. Split on those blank lines FIRST and isolate just the
+    // block that contains the "Session ID" header, so parsing never bleeds
+    // past the end of the Training Log table into the next tab's table
+    // (e.g. the Summary tab that immediately follows it).
+    var blocks = text.split(/\n\s*\n/);
+    var block = null;
+    for(var bi=0; bi<blocks.length; bi++){
+      if(blocks[bi].indexOf("Session ID") !== -1){ block = blocks[bi]; break; }
+    }
+    if(block === null) return null;
+    var lines = block.split("\n").map(function(l){return l.trim();}).filter(function(l){return l.indexOf("|") === 0;});
+    if(!lines.length) return null;
+    function cells(line){
+      var inner = line.replace(/^\|/, "").replace(/\|$/, "");
+      return inner.split("|").map(function(c){return c.trim();});
+    }
+    function isSeparator(line){
+      return cells(line).every(function(c){ return c === "" || /^:?-+:?$/.test(c); });
+    }
+    var header = null, headerIdx = -1;
+    for(var i=0;i<lines.length;i++){
+      if(isSeparator(lines[i])) continue;
+      var c = cells(lines[i]);
+      if(c.indexOf("Session ID") !== -1){ header = c; headerIdx = i; break; }
+    }
+    if(!header) return null;
+    var dataLines = lines.slice(headerIdx+1).filter(function(l){ return !isSeparator(l); });
+    return dataLines.map(function(line){
+      var vals = cells(line);
+      var row = {};
+      header.forEach(function(h, i){ row[h] = vals[i] !== undefined ? vals[i] : ""; });
+      return row;
+    }).filter(function(r){ return r["Session ID"]; });
+  }
+
+  // Some rows use a property's short code (as listed on Properties Reference)
+  // and others use its full name for the same physical property -- without
+  // reconciling these, the year planner would show two separate rows for
+  // one lodge. Mapped here from Winnie's own Properties Reference tab
+  // wherever both a code and a full name are actually in use in the log.
+  // NOTE: if new naming inconsistencies show up later, add them here.
+  var PROPERTY_ALIASES = {
+    "lewa safari camp": "LSC",
+    "loisaba tented camp": "LTC"
+  };
+  function canonicalProperty(p){
+    if(!p) return p;
+    var alias = PROPERTY_ALIASES[String(p).trim().toLowerCase()];
+    return alias || p;
+  }
+
+  function normalize(rows){
+    // Note: rows without a parseable date are kept (shown as "Date TBC" in
+    // KPIs and the session table) rather than dropped here — only the
+    // Gantt bar placement needs a real start/end, and it filters for that
+    // itself in renderGantt.
+    return rows.map(function(r){
+      var start = parseUTC(r["Start Date"]);
+      var end = parseUTC(r["End Date"]) || start;
+      return {
+        id: r["Session ID"] || "",
+        // Winnie's sheet has used both "Hosting Property" and, before that,
+        // "Property Code" for this column -- accept either so a header
+        // rename on the sheet doesn't silently blank out every row's property.
+        property: canonicalProperty(r["Hosting Property"] || r["Property Code"] || ""),
+        country: r["Country"] || "",
+        department: r["Department"] || "",
+        category: r["Category"] || "",
+        area: r["Training Area"] || "",
+        participatingProperty: r["Participating Property"] || "",
+        start: start,
+        end: end,
+        trainer: r["Trainer / Facilitator"] || "",
+        attendeesPlanned: num(r["Attendees Planned"]),
+        attendeesTrained: num(r["Attendees Trained"]),
+        individualHours: num(r["Individual Training Hrs"]),
+        totalHours: num(r["Total Training Hrs"]),
+        budget: num(r["Budget (USD)"]),
+        status: r["Status"] || "Planned",
+        notes: r["Notes"] || "",
+        conflict: /⚠/.test(r["Scheduling Conflict"] || "")
+      };
+    });
+  }
+
+  // ---------- filters ----------
+  var FILTER_FIELDS = [
+    {key:"country", id:"fCountry", allLabel:"All countries"},
+    {key:"property", id:"fProperty", allLabel:"All venues"},
+    {key:"department", id:"fDepartment", allLabel:"All departments"},
+    {key:"category", id:"fCategory", allLabel:"All categories"},
+    {key:"area", id:"fArea", allLabel:"All training types"},
+    {key:"status", id:"fStatus", allLabel:"All statuses"}
+  ];
+  var FILTERS = {};
+  FILTER_FIELDS.forEach(function(f){ FILTERS[f.key] = ""; });
+
+  // A row matches when it satisfies every active filter except (optionally)
+  // one dimension being excluded -- used both to apply filters (excludeKey
+  // null) and to build cascading dropdown options (e.g. so the Property
+  // list only shows properties left over after the Country filter, without
+  // also hiding itself).
+  function matchesFilters(r, excludeKey){
+    for(var i=0;i<FILTER_FIELDS.length;i++){
+      var f = FILTER_FIELDS[i];
+      if(f.key === excludeKey) continue;
+      var val = FILTERS[f.key];
+      if(!val) continue;
+      if(f.key === "department"){
+        if(val === "All Departments"){ if(r.department !== "All Departments") return false; }
+        else { if(r.department !== val && r.department !== "All Departments") return false; }
+      } else if(r[f.key] !== val){
+        return false;
+      }
+    }
+    return true;
+  }
+  function applyFilters(rows){ return rows.filter(function(r){ return matchesFilters(r, null); }); }
+  function optionsExcluding(rows, excludeKey){ return rows.filter(function(r){ return matchesFilters(r, excludeKey); }); }
+
+  function uniqueSorted(rows, key){
+    var set = {};
+    rows.forEach(function(r){ var v = r[key]; if(v) set[v] = true; });
+    return Object.keys(set).sort(function(a,b){ return a.localeCompare(b); });
+  }
+
+  function fillSelect(id, values, allLabel, filterKey){
+    var sel = document.getElementById(id);
+    var current = FILTERS[filterKey];
+    sel.innerHTML = '<option value="">'+esc(allLabel)+'</option>' + values.map(function(v){
+      return '<option value="'+esc(v)+'"'+(v===current?' selected':'')+'>'+esc(v)+'</option>';
+    }).join("");
+    if(current && values.indexOf(current) === -1){
+      // The previously selected value no longer appears in the data (e.g.
+      // filters narrowed it away) -- fall back to "All" for this field.
+      FILTERS[filterKey] = "";
+    }
+  }
+
+  function populateFilters(allRows){
+    FILTER_FIELDS.forEach(function(f){
+      var base = optionsExcluding(allRows, f.key);
+      var values;
+      if(f.key === "category"){
+        values = CATEGORIES.map(function(c){return c.name;}).filter(function(n){
+          return base.some(function(r){ return r.category === n; });
+        });
+        uniqueSorted(base, "category").forEach(function(c){ if(values.indexOf(c) === -1) values.push(c); });
+      } else {
+        values = uniqueSorted(base, f.key);
+      }
+      fillSelect(f.id, values, f.allLabel, f.key);
+    });
+  }
+
+  function renderFilterSummary(total, shown){
+    var el = document.getElementById("filterSummary");
+    var anyActive = FILTER_FIELDS.some(function(f){ return FILTERS[f.key]; });
+    el.textContent = anyActive ? ("Showing " + shown + " of " + total + " sessions") : "";
+  }
+
+  function setupFilters(){
+    FILTER_FIELDS.forEach(function(f){
+      document.getElementById(f.id).addEventListener("change", function(e){
+        FILTERS[f.key] = e.target.value;
+        render(lastAllRows, lastMeta);
+      });
+    });
+    document.getElementById("clearFiltersBtn").addEventListener("click", function(){
+      FILTER_FIELDS.forEach(function(f){ FILTERS[f.key] = ""; });
+      render(lastAllRows, lastMeta);
+    });
+  }
+
+  // ---------- rendering ----------
+  var lastAllRows = [];
+  var lastMeta = {live:false, updatedAt:null};
+
+  function render(rows, meta){
+    lastAllRows = rows;
+    lastMeta = meta;
+    renderStatus(meta);
+    populateFilters(rows);
+    var filtered = applyFilters(rows);
+    renderKpis(filtered);
+    renderCategories(filtered);
+    renderCategoryDonut(filtered);
+    renderCategoryHours(filtered);
+    renderGantt(filtered);
+    renderTable(filtered);
+    renderTrainers(filtered);
+    renderFilterSummary(rows.length, filtered.length);
+  }
+
+  function renderStatus(meta){
+    var pill = document.getElementById("statusPill");
+    var text = document.getElementById("statusText");
+    var updated = document.getElementById("updatedText");
+    if(meta.live){
+      pill.className = "pill live";
+      text.textContent = "Live";
+    } else {
+      pill.className = "pill snapshot";
+      text.textContent = "Snapshot";
+    }
+    if(meta.updatedAt){
+      updated.textContent = "Updated " + new Date(meta.updatedAt).toLocaleString();
+    } else {
+      updated.textContent = "";
+    }
+    var banner = document.getElementById("banner");
+    if(meta.bannerText){
+      banner.className = "banner show " + (meta.bannerLevel || "");
+      banner.innerHTML = meta.bannerText;
+    } else {
+      banner.className = "banner";
+      banner.innerHTML = "";
+    }
+  }
+
+  function renderKpis(rows){
+    var sessions = rows.length;
+    var properties = {};
+    rows.forEach(function(r){ if(r.property) properties[r.property] = true; });
+    var propCount = Object.keys(properties).length;
+    var planned = 0, trained = 0, anyAttendance = false;
+    rows.forEach(function(r){
+      planned += r.attendeesPlanned; trained += r.attendeesTrained;
+      if(r.attendeesPlanned || r.attendeesTrained) anyAttendance = true;
+    });
+
+    var conflictCount = rows.filter(function(r){ return r.conflict; }).length;
+
+    var tiles = [
+      {label:"Training sessions", value: sessions.toLocaleString(), sub: propCount + " " + (propCount===1?"property":"properties") + " covered"},
+      {label:"People trained", value: anyAttendance ? trained.toLocaleString() : "—",
+        sub: anyAttendance ? ("of " + planned.toLocaleString() + " planned") : "Add attendee counts as sessions happen"},
+      {label:"Categories active", value: activeCategoryCount(rows) + " / 6", sub: "Approved learning categories in use"},
+      {label:"Possible double-bookings", value: conflictCount.toLocaleString(),
+        sub: conflictCount ? "Same department, overlapping dates — see red rows below" : "None flagged", warn: conflictCount > 0}
+    ];
+    document.getElementById("kpis").innerHTML = tiles.map(function(t){
+      return '<div class="kpi'+(t.warn?' kpi-warn':'')+'"><div class="stat-label">'+esc(t.label)+'</div>'+
+        '<div class="stat-value">'+esc(t.value)+'</div>'+
+        '<div class="stat-sub">'+esc(t.sub)+'</div></div>';
+    }).join("");
+  }
+
+  function activeCategoryCount(rows){
+    var set = {};
+    rows.forEach(function(r){ if(r.category) set[r.category] = true; });
+    return Object.keys(set).length;
+  }
+
+  function renderCategories(rows){
+    var counts = {};
+    CATEGORIES.forEach(function(c){ counts[c.name] = 0; });
+    rows.forEach(function(r){
+      if(!(r.category in counts)){ counts[r.category] = 0; }
+      counts[r.category]++;
+    });
+    var names = CATEGORIES.map(function(c){return c.name;});
+    Object.keys(counts).forEach(function(n){ if(names.indexOf(n) === -1) names.push(n); });
+    var total = rows.length || 1;
+
+    document.getElementById("catGrid").innerHTML = names.map(function(name){
+      var colorVar = CAT_COLOR[name] || FALLBACK_COLOR;
+      var count = counts[name];
+      var share = Math.round((count/total)*100);
+      var meta = CAT_META[name];
+      var bandHtml = "";
+      var targetText = "";
+      if(meta && meta.max != null){
+        var bMin = meta.min || 0;
+        bandHtml = '<div class="cat-target" style="left:'+bMin+'%;width:'+(meta.max-bMin)+'%"></div>';
+        targetText = " (target " + (bMin ? (bMin + "–" + meta.max) : ("≤" + meta.max)) + "%)";
+      }
+      return '<div class="cat-row">'+
+        '<div class="cat-name"><span class="cat-swatch" style="background:var('+colorVar+')"></span>'+esc(name)+'</div>'+
+        '<div class="cat-track">'+bandHtml+'<div class="cat-fill" style="width:'+share+'%;background:var('+colorVar+')"></div></div>'+
+        '<div class="cat-figure">'+count+' '+(count===1?"session":"sessions")+' · '+share+'%'+esc(targetText)+'</div>'+
+        '</div>';
+    }).join("");
+  }
+
+  function renderCategoryDonut(rows){
+    var counts = {};
+    rows.forEach(function(r){ if(r.category){ counts[r.category] = (counts[r.category]||0)+1; } });
+    var names = Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; });
+    var total = rows.length;
+    var wrap = document.getElementById("catDonutWrap");
+    if(!total || !names.length){
+      wrap.innerHTML = '<div class="empty">No sessions to chart yet.</div>';
+      return;
+    }
+    var acc = 0;
+    var stops = [];
+    var legendRows = names.map(function(name){
+      var count = counts[name];
+      var pct = count/total*100;
+      var colorVar = CAT_COLOR[name] || FALLBACK_COLOR;
+      var from = acc, to = acc + pct;
+      acc = to;
+      stops.push('var('+colorVar+') '+from.toFixed(2)+'% '+to.toFixed(2)+'%');
+      return '<div class="row"><span class="swatch" style="background:var('+colorVar+')"></span>'+esc(name)+'<span class="pct">'+Math.round(pct)+'%</span></div>';
+    }).join("");
+    wrap.innerHTML =
+      '<div class="donut-wrap">' +
+        '<div class="donut" style="background:conic-gradient('+stops.join(", ")+')">' +
+          '<div class="donut-center"><span class="n">'+total+'</span><span class="lbl">Sessions</span></div>' +
+        '</div>' +
+        '<div class="donut-legend">'+legendRows+'</div>' +
+      '</div>';
+  }
+
+  // Total Training Hrs (from the sheet's own Individual Hrs × Attendees
+  // Planned) gives real training-hour totals wherever both figures are
+  // filled in. Sessions still missing an attendee count contribute 0 here
+  // until that's filled in -- surfaced via hoursGap below rather than hidden.
+  function computeCategoryHours(rows){
+    var scheduled = {}, completed = {}, gap = {};
+    rows.forEach(function(r){
+      if(!r.category) return;
+      scheduled[r.category] = (scheduled[r.category]||0) + r.totalHours;
+      if(String(r.status).toLowerCase() === "completed"){
+        completed[r.category] = (completed[r.category]||0) + r.totalHours;
+      }
+      if(r.totalHours === 0 && r.individualHours > 0){
+        gap[r.category] = (gap[r.category]||0) + 1;
+      }
+    });
+    return {scheduled: scheduled, completed: completed, gap: gap};
+  }
+
+  function renderCategoryHours(rows){
+    var d = computeCategoryHours(rows);
+    var names = {};
+    Object.keys(d.scheduled).forEach(function(n){ names[n] = true; });
+    Object.keys(d.completed).forEach(function(n){ names[n] = true; });
+    var list = Object.keys(names).sort(function(a,b){ return (d.scheduled[b]||0) - (d.scheduled[a]||0); });
+    var body = document.getElementById("catHoursBody");
+    if(!list.length){
+      body.innerHTML = '<tr><td colspan="3" class="empty">No sessions logged yet.</td></tr>';
+      return;
+    }
+    body.innerHTML = list.map(function(name){
+      var gapCount = d.gap[name] || 0;
+      var gapNote = gapCount ? ' <span class="muted-cell">('+gapCount+' missing attendees)</span>' : '';
+      return '<tr><td>'+esc(name)+gapNote+'</td><td class="num">'+Math.round(d.scheduled[name]||0).toLocaleString()+'</td><td class="num">'+Math.round(d.completed[name]||0).toLocaleString()+'</td></tr>';
+    }).join("");
+  }
+
+  function renderGanttLegend(rows){
+    var used = {};
+    rows.forEach(function(r){ if(r.category) used[r.category] = true; });
+    var names = CATEGORIES.map(function(c){return c.name;}).filter(function(n){ return used[n]; });
+    Object.keys(used).forEach(function(n){ if(names.indexOf(n) === -1) names.push(n); });
+    document.getElementById("ganttLegend").innerHTML = names.map(function(name){
+      var colorVar = CAT_COLOR[name] || FALLBACK_COLOR;
+      return '<span class="legend-item"><span class="cat-swatch" style="background:var('+colorVar+')"></span>'+esc(name)+'</span>';
+    }).join("");
+  }
+
+  // Cancelled beats any other status in a merged segment (most important to
+  // surface); a segment that's uniformly Completed or Confirmed gets that
+  // treatment; anything else (mixed, or the default Planned) reads as
+  // tentative -- the safest default for a date that isn't locked yet.
+  function statusClassFor(statusSet){
+    var keys = Object.keys(statusSet).map(function(s){ return String(s).toLowerCase(); });
+    if(keys.indexOf("cancelled") !== -1) return "bar-cancelled";
+    if(keys.length === 1 && keys[0] === "completed") return "bar-completed";
+    if(keys.length === 1 && keys[0] === "confirmed") return "bar-confirmed";
+    return "bar-planned";
+  }
+
+  function renderGantt(rows){
+    renderGanttLegend(rows);
+    var wrap = document.getElementById("ganttWrap");
+    var note = document.getElementById("ganttNote");
+    // Only rows with a real start AND end date can be placed as a bar on
+    // the year planner. Rows still missing dates (e.g. Tanzania sessions
+    // awaiting WIMS confirmation) still show up in the KPIs and session
+    // table below — they're just not on this chart yet.
+    var dated = rows.filter(function(r){ return r.start && r.end; });
+    var undated = rows.length - dated.length;
+    if(!dated.length){
+      wrap.innerHTML = '<div class="empty">No sessions with confirmed dates yet for 2027.</div>';
+      note.textContent = "";
+      return;
+    }
+    // group into property rows
+    var byProp = {};
+    var order = [];
+    dated.forEach(function(r){
+      if(!byProp[r.property]){ byProp[r.property] = {country:r.country, segments:{}, earliest:r.start}; order.push(r.property); }
+      var p = byProp[r.property];
+      if(r.start < p.earliest) p.earliest = r.start;
+      var key = r.start.getTime()+"_"+r.end.getTime();
+      if(!p.segments[key]) p.segments[key] = {start:r.start, end:r.end, areas:[], categories:{}, statuses:{}, openToAll:false};
+      p.segments[key].areas.push(r.area || r.category);
+      p.segments[key].categories[r.category] = true;
+      p.segments[key].statuses[r.status || "Planned"] = true;
+      if(String(r.participatingProperty || "").toUpperCase() === "ALL") p.segments[key].openToAll = true;
+    });
+    order.sort(function(a,b){ return byProp[a].earliest - byProp[b].earliest; });
+    note.textContent = order.length + " " + (order.length===1?"property":"properties") + " scheduled so far" +
+      (undated ? " · " + undated + " session" + (undated===1?"":"s") + " awaiting confirmed dates (see table below)" : "");
+
+    var monthWidths = [];
+    for(var m=0;m<12;m++){
+      var days = (Date.UTC(YEAR,m+1,1) - Date.UTC(YEAR,m,1))/86400000;
+      monthWidths.push(days/YEAR_DAYS*100);
+    }
+    var monthsHtml = '<div class="gantt-months"><div class="row-label" style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);">Hosting venue</div><div class="month-track">' +
+      MONTHS.map(function(name,i){
+        var q = (i % 3 === 0) ? " q-start" : "";
+        return '<div class="month-cell'+q+'" style="width:'+monthWidths[i]+'%">'+name+'</div>';
+      }).join("") +
+      '</div></div>';
+
+    var rowsHtml = order.map(function(prop){
+      var p = byProp[prop];
+      var segs = Object.keys(p.segments).map(function(k){ return p.segments[k]; });
+      var bars = segs.map(function(s, idx){
+        var left = dayOfYear(s.start)/YEAR_DAYS*100;
+        var width = Math.max((dayOfYear(s.end)-dayOfYear(s.start)+1)/YEAR_DAYS*100, 0.9);
+        var catNames = Object.keys(s.categories);
+        var colorVar = CAT_COLOR[catNames[0]] || FALLBACK_COLOR;
+        var statusCls = statusClassFor(s.statuses);
+        var statusLabel = Object.keys(s.statuses).join(", ");
+        var uniqueAreas = uniqList(s.areas);
+        var trainingName = uniqueAreas.join(", ");
+        var label = esc(prop) + "<br>" + esc(trainingName) + "<br>" + esc(fmtDate(s.start)) + (s.end.getTime()!==s.start.getTime() ? (" – " + esc(fmtDate(s.end))) : "") + "<br>" + esc(statusLabel) + (s.openToAll ? "<br>Open to all properties" : "");
+        var barHtml = '<div class="bar '+statusCls+'" data-tt="'+label+'" data-idx="'+idx+'" style="left:'+left+'%;width:'+width+'%;background-color:var('+colorVar+')"></div>';
+        // The training name is printed beside the bar itself (not just in the
+        // hover tooltip) so the chart is readable without hovering -- a
+        // hosting venue on its own (e.g. "Moshi") doesn't say what's running.
+        // The inline left below is a reasonable starting guess (bar's own
+        // start plus its approximate rendered width) so the label is never
+        // badly placed even before layout runs; positionBarLabels then
+        // corrects it to the bar's *actual* rendered right edge in pixels.
+        var labelHtml = '<div class="bar-label" data-tt="'+label+'" data-idx="'+idx+'" style="left:calc('+left+'% + 18px)">'+esc(truncateLabel(trainingName, 46))+'</div>';
+        return barHtml + labelHtml;
+      }).join("");
+      return '<div class="gantt-row"><div class="row-label">'+esc(prop)+'<span class="country">'+esc(p.country)+'</span></div>'+
+        '<div class="track">'+bars+'</div></div>';
+    }).join("");
+
+    wrap.innerHTML = monthsHtml + '<div class="gantt-body">' + rowsHtml + '</div>';
+    attachTooltips(wrap);
+    positionBarLabels(wrap);
+    // Re-run once layout has fully settled (webfont swap-in can reflow text
+    // metrics a moment after first paint) so labels stay correctly placed
+    // rather than relying on a single synchronous measurement.
+    if(typeof requestAnimationFrame === "function"){
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ positionBarLabels(wrap); }); });
+    }
+  }
+
+  // Each training name is printed inline right after its own bar rather than
+  // stacked underneath it -- reads like a normal timeline label instead of
+  // eating a second text line per session. Run after real layout since it
+  // depends on each bar's actual rendered pixel position/width. Two sessions
+  // at the same venue close together in time can still produce a label that
+  // would run into the next bar; when that happens the label is shrunk or --
+  // if there truly isn't room -- hidden, so nothing overlaps. The full name
+  // is always still available by hovering the bar (or label) itself.
+  function positionBarLabels(root){
+    var GAP = 5;
+    root.querySelectorAll(".track").forEach(function(track){
+      // Defensive: a single row with unexpected data should never take down
+      // the positioning pass for every other row (labels already have a
+      // reasonable inline fallback position set at creation time, so the
+      // worst case here is that one row keeps its approximate position).
+      try{
+        var bars = Array.prototype.slice.call(track.querySelectorAll(".bar"));
+        if(!bars.length) return;
+        bars.sort(function(a,b){ return a.offsetLeft - b.offsetLeft; });
+        var pairs = bars.map(function(bar){
+          var label = track.querySelector('.bar-label[data-idx="'+bar.getAttribute("data-idx")+'"]');
+          if(label){ label.style.left = (bar.offsetLeft + bar.offsetWidth + GAP) + "px"; }
+          return {bar:bar, label:label};
+        });
+        var trackWidth = track.clientWidth;
+        for(var i=0;i<pairs.length;i++){
+          var label = pairs[i].label;
+          if(!label) continue;
+          var nextLeft = (i+1 < pairs.length) ? pairs[i+1].bar.offsetLeft : trackWidth;
+          var available = nextLeft - label.offsetLeft - GAP;
+          if(!isFinite(available)) continue;
+          if(label.scrollWidth <= available) continue;
+          if(available < 24){ label.style.display = "none"; continue; }
+          var text = label.textContent.replace(/…$/, "");
+          var guard = 0;
+          while(text.length > 3 && label.scrollWidth > available && guard < 60){
+            text = text.slice(0, -1);
+            label.textContent = text + "…";
+            guard++;
+          }
+          if(label.scrollWidth > available) label.style.display = "none";
+        }
+      } catch(err){ /* leave this row's labels at their inline fallback position */ }
+    });
+  }
+
+  function attachTooltips(root){
+    var tt = document.getElementById("tooltip");
+    root.querySelectorAll(".bar, .bar-label").forEach(function(bar){
+      bar.addEventListener("mousemove", function(e){
+        tt.innerHTML = bar.getAttribute("data-tt");
+        var x = e.clientX + 14, y = e.clientY + 14;
+        var maxX = window.innerWidth - 280, maxY = window.innerHeight - 120;
+        tt.style.left = Math.min(x, maxX) + "px";
+        tt.style.top = Math.min(y, maxY) + "px";
+        tt.classList.add("show");
+      });
+      bar.addEventListener("mouseleave", function(){ tt.classList.remove("show"); });
+    });
+  }
+
+  function renderTable(rows){
+    // Sort by date first (month/day order), then by property when two
+    // sessions share a date. Rows without a parseable date (Date TBC) sort
+    // to the end rather than breaking the comparator or clumping at the top.
+    var sorted = rows.slice().sort(function(a,b){
+      var av = a.start ? a.start.getTime() : Infinity;
+      var bv = b.start ? b.start.getTime() : Infinity;
+      if(av !== bv) return av - bv;
+      return String(a.property || "").localeCompare(String(b.property || ""));
+    });
+    document.getElementById("tableNote").textContent = sorted.length + " logged " + (sorted.length===1?"session":"sessions");
+    document.getElementById("tableBody").innerHTML = sorted.map(function(r){
+      var colorVar = CAT_COLOR[r.category] || FALLBACK_COLOR;
+      var dateStr = r.start ?
+        (fmtDate(r.start) + (r.end && r.end.getTime()!==r.start.getTime() ? (" – " + fmtDate(r.end)) : "")) :
+        '<span class="muted-cell">Date TBC</span>';
+      var attendance = (r.attendeesPlanned || r.attendeesTrained) ?
+        (r.attendeesTrained || "0") + " / " + (r.attendeesPlanned || "—") :
+        '<span class="muted-cell">not recorded</span>';
+      var statusClass = String(r.status).toLowerCase();
+      return '<tr'+(r.conflict?' class="conflict-row" title="Possible double-booking: this department already has a session on an overlapping date at this property"':'')+'>'+
+        '<td>'+(r.conflict?'<span aria-hidden="true">⚠️ </span>':'')+esc(r.property)+'</td>'+
+        '<td>'+(r.department ? esc(r.department) : '<span class="muted-cell">&mdash;</span>')+'</td>'+
+        '<td><span class="tag"><span class="cat-swatch" style="background:var('+colorVar+')"></span>'+esc(r.category)+'</span></td>'+
+        '<td>'+esc(r.area)+'</td>'+
+        '<td>'+(r.start ? esc(dateStr) : dateStr)+'</td>'+
+        '<td>'+(r.trainer ? esc(r.trainer) : '<span class="muted-cell">TBC</span>')+'</td>'+
+        '<td class="num">'+attendance+'</td>'+
+        '<td><span class="status-pill '+esc(statusClass)+'">'+esc(r.status)+'</span></td>'+
+        '</tr>';
+    }).join("");
+  }
+
+  // ---------- trainer workload ----------
+  // Flags a trainer whose sessions leave under 3 days between finishing at
+  // one property and starting at another -- a rough travel-time proxy, not
+  // a hard rule (same-property back-to-back sessions are normal and excluded).
+  function computeTrainerWorkload(rows){
+    var byTrainer = {};
+    rows.forEach(function(r){
+      var name = r.trainer && String(r.trainer).trim();
+      if(!name) return;
+      if(!byTrainer[name]) byTrainer[name] = { sessions: [], properties: {} };
+      byTrainer[name].sessions.push(r);
+      if(r.property) byTrainer[name].properties[r.property] = true;
+    });
+    var names = Object.keys(byTrainer).sort(function(a,b){ return byTrainer[b].sessions.length - byTrainer[a].sessions.length; });
+    return names.map(function(name){
+      var t = byTrainer[name];
+      var dated = t.sessions.filter(function(r){ return r.start && r.end; }).slice().sort(function(a,b){ return a.start - b.start; });
+      var tight = false;
+      for(var i=1;i<dated.length;i++){
+        var prev = dated[i-1], cur = dated[i];
+        if(cur.property === prev.property) continue;
+        var gapDays = (cur.start - prev.end) / 86400000;
+        if(gapDays < 3){ tight = true; break; }
+      }
+      var span = dated.length ? (fmtDate(dated[0].start) + " – " + fmtDate(dated[dated.length-1].end)) : "Date TBC";
+      return { name: name, count: t.sessions.length, properties: Object.keys(t.properties).sort(), span: span, tight: tight };
+    });
+  }
+
+  function renderTrainers(rows){
+    var data = computeTrainerWorkload(rows);
+    var body = document.getElementById("trainerBody");
+    var note = document.getElementById("trainerNote");
+    if(!data.length){
+      body.innerHTML = '<tr><td colspan="4" class="empty">No trainers logged yet.</td></tr>';
+      note.textContent = "";
+      return;
+    }
+    var flagged = data.filter(function(d){ return d.tight; }).length;
+    note.textContent = data.length + " " + (data.length===1?"trainer":"trainers") + " scheduled" +
+      (flagged ? " · " + flagged + " with a tight turnaround between properties" : "");
+    body.innerHTML = data.map(function(d){
+      return '<tr'+(d.tight?' class="conflict-row" title="Under 3 days between finishing at one property and starting at another — check travel time"':'')+'>'+
+        '<td>'+(d.tight?'<span aria-hidden="true">⚠️ </span>':'')+esc(d.name)+'</td>'+
+        '<td class="num">'+d.count+'</td>'+
+        '<td>'+esc(d.properties.join(", "))+'</td>'+
+        '<td>'+esc(d.span)+'</td>'+
+        '</tr>';
+    }).join("");
+  }
+
+  // ---------- data loading via the published Apps Script feed ----------
+  // WEBAPP_URL (set above) returns JSON shaped {rows:[...], generatedAt:"..."}
+  // -- one object per session, keyed by the same column names as the sheet's
+  // header row (Budget (USD) is intentionally left out of this public feed).
+  // See SETUP_GUIDE.md for how that feed is published and deployed.
+  var lastGoodRows = normalize(FALLBACK_ROWS);
+  var isLive = false;
+  var notWiredUp = WEBAPP_URL.indexOf("REPLACE_WITH") === 0;
+
+  function applyFeed(data){
+    var rows = data && Array.isArray(data.rows) ? data.rows : null;
+    if(rows && rows.length){
+      lastGoodRows = normalize(rows);
+      isLive = true;
+      render(lastGoodRows, {live:true, updatedAt: data.generatedAt ? Date.parse(data.generatedAt) : Date.now()});
+    } else {
+      // Feed reached us but had nothing parseable (e.g. sheet emptied) -- keep last good, note it.
+      render(lastGoodRows, {live:isLive, updatedAt: Date.now(),
+        bannerText:"The live feed returned no rows to display &mdash; showing the last data we had.", bannerLevel:"warn"});
+    }
+  }
+
+  function bannerForFetchError(){
+    return "Couldn't reach the live training feed just now &mdash; showing the last data we had. " +
+      "If this keeps happening, check that the Apps Script Web App is still deployed with &ldquo;Anyone&rdquo; access.";
+  }
+
+  function loadLive(){
+    if(notWiredUp){
+      render(lastGoodRows, {live:false, updatedAt:null,
+        bannerText:"This page isn't wired up to a live feed yet &mdash; showing the training data bundled with this page.", bannerLevel:"warn"});
+      return;
+    }
+    var bust = (WEBAPP_URL.indexOf("?") === -1 ? "?" : "&") + "t=" + Date.now(); // avoid a stale cached response
+    fetch(WEBAPP_URL + bust, {cache:"no-store"})
+      .then(function(res){ if(!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      .then(applyFeed)
+      .catch(function(){
+        render(lastGoodRows, {live:isLive, updatedAt: Date.now(), bannerText: bannerForFetchError(), bannerLevel: isLive ? "warn" : "error"});
+      });
+  }
+
+  function boot(){
+    setupFilters();
+    render(lastGoodRows, {live:false, updatedAt:null,
+      bannerText: notWiredUp ? "" : "Connecting to the live training feed…", bannerLevel:""});
+    loadLive();
+    if(!notWiredUp) setInterval(loadLive, REFRESH_MS);
+    document.getElementById("refreshBtn").addEventListener("click", loadLive);
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
+</script>
