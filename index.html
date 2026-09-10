@@ -92,6 +92,7 @@
   }
   button.btn:hover, a.btn:hover{ filter:brightness(0.97); }
   button.btn:focus-visible, a.btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  a.btn.btn-small{ padding:5px 10px; font-size:12px; white-space:nowrap; }
 
   .banner{
     display:none; margin-bottom:18px; padding:11px 14px; border-radius:10px; font-size:13.5px;
@@ -413,7 +414,7 @@
           <thead>
             <tr>
               <th>Hosting venue</th><th>Department</th><th>Category</th><th>Training name</th><th>Dates</th>
-              <th>Trainer</th><th class="num">Attendees</th><th>Status</th>
+              <th>Trainer</th><th class="num">Attendees</th><th>Status</th><th>Attendance</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
@@ -462,6 +463,18 @@
   // for how the feed is set up. Paste your deployed Web App's /exec URL below.
   var WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyv5kbNXC2Pl2SolhcOkkCunSvtm-a4K43_CYk5AgDPKx1k9gnjH_ioXi70KaukWtZL/exec";
   var REFRESH_MS = 300000; // 5 minutes
+
+  // "Record attendance" links open Winnie's Google Form pre-filled to the
+  // session's own Session ID, so a GM never has to look one up or type it in.
+  // ATTENDANCE_FORM_ENTRY is the form's internal field ID for the Session ID
+  // question, taken from a pre-filled link Winnie generated (Form -> ⋮ menu
+  // -> Pre-fill form -> type a Session ID -> Get link).
+  var ATTENDANCE_FORM_BASE = "https://docs.google.com/forms/d/e/1FAIpQLScvF6LG-4sg75OgN26hk8DubMOMz5FOYboF4-ca0qyPh6ZkPA/viewform";
+  var ATTENDANCE_FORM_ENTRY = "entry.650248237";
+  function attendanceLink(sessionId){
+    return ATTENDANCE_FORM_BASE + "?usp=pp_url&" + ATTENDANCE_FORM_ENTRY + "=" + encodeURIComponent(sessionId);
+  }
+
   var YEAR = 2027;
   var YEAR_START = Date.UTC(YEAR,0,1);
   var YEAR_DAYS = (Date.UTC(YEAR,11,31) - YEAR_START)/86400000 + 1; // 365
@@ -1098,6 +1111,7 @@
         '<td>'+(r.trainer ? esc(r.trainer) : '<span class="muted-cell">TBC</span>')+'</td>'+
         '<td class="num">'+attendance+'</td>'+
         '<td><span class="status-pill '+esc(statusClass)+'">'+esc(r.status)+'</span></td>'+
+        '<td>'+(r.id ? '<a class="btn btn-small" href="'+esc(attendanceLink(r.id))+'" target="_blank" rel="noopener">Record attendance &#8599;</a>' : '<span class="muted-cell">&mdash;</span>')+'</td>'+
         '</tr>';
     }).join("");
   }
