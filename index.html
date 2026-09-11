@@ -43,6 +43,7 @@
   }
 
   *{box-sizing:border-box;}
+  html{ scroll-behavior:smooth; }
   body{
     margin:0; background:var(--page); color:var(--text-primary);
     font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -75,6 +76,16 @@
   .toolbar{
     display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:22px;
   }
+
+  /* ---------- primary action bar ---------- */
+  .action-bar{
+    display:flex; flex-wrap:wrap; align-items:center; gap:12px 16px; margin-bottom:22px;
+    padding:14px 18px; background:var(--accent-soft); border:1px solid var(--accent-soft-border);
+    border-radius:12px;
+  }
+  .action-bar p{ margin:0; font-size:13.5px; font-weight:600; color:var(--text-primary); flex:1 1 260px; }
+  .action-bar .quick-actions{ display:flex; flex-wrap:wrap; gap:8px; }
+  .action-bar .btn{ background:var(--surface); }
   .pill{
     display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600;
     padding:5px 11px; border-radius:999px; border:1px solid var(--border); color:var(--text-secondary);
@@ -104,13 +115,19 @@
 
   /* ---------- KPIs ---------- */
   .kpis{
-    display:grid; grid-template-columns:repeat(4,1fr); margin-bottom:28px;
+    display:grid; grid-template-columns:repeat(5,1fr); margin-bottom:28px;
     background:var(--surface); border:1px solid var(--border); border-radius:14px;
     box-shadow:var(--shadow); overflow:hidden;
+  }
+  @media (max-width:900px){
+    .kpis{ grid-template-columns:repeat(3,1fr);}
+    .kpi:nth-child(3n+1){ border-left:none; }
+    .kpi:nth-child(n+4){ border-top:1px solid var(--border); }
   }
   @media (max-width:760px){
     .kpis{ grid-template-columns:repeat(2,1fr);}
     .kpi:nth-child(2n+1){ border-left:none; }
+    .kpi:nth-child(3n+1){ border-left:none; }
     .kpi:nth-child(n+3){ border-top:1px solid var(--border); }
   }
   .kpi{
@@ -152,6 +169,40 @@
   .filters-bar .btn{ flex:none; }
   .filters-bar .section-note{ margin-left:auto; align-self:center; white-space:nowrap; }
   @media (max-width:760px){ .filters-bar .section-note{ margin-left:0; width:100%; } }
+  .more-filters-row{ display:none; flex-wrap:wrap; gap:10px 14px; width:100%; margin-top:2px; padding-top:12px; border-top:1px dashed var(--border); }
+  .more-filters-row.show{ display:flex; }
+
+  /* ---------- upcoming training ---------- */
+  .upcoming-list{ display:flex; flex-direction:column; }
+  .upcoming-row{
+    display:grid; grid-template-columns: 88px 1fr auto auto; align-items:center; gap:14px;
+    padding:12px 4px; border-bottom:1px solid var(--grid);
+  }
+  .upcoming-row:last-child{ border-bottom:none; }
+  .upcoming-row .u-date{ font-size:13px; font-weight:700; color:var(--text-primary); line-height:1.3; }
+  .upcoming-row .u-date span{ display:block; font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; }
+  .upcoming-row .u-main{ min-width:0; }
+  .upcoming-row .u-title{ font-size:13.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .upcoming-row .u-sub{ font-size:12px; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+  @media (max-width:640px){
+    .upcoming-row{ grid-template-columns: 1fr auto; grid-template-areas: "date status" "main main" "action action"; row-gap:6px; }
+    .upcoming-row .u-date{ grid-area:date; }
+    .upcoming-row .u-status{ grid-area:status; justify-self:end; }
+    .upcoming-row .u-main{ grid-area:main; }
+    .upcoming-row .u-action{ grid-area:action; }
+    .upcoming-row .u-action .btn{ width:100%; justify-content:center; }
+  }
+
+  /* ---------- T&D review badges ---------- */
+  .td-badge{ font-size:11px; font-weight:700; padding:1px 7px; border-radius:999px; white-space:nowrap; display:inline-block; }
+  .td-badge.pending{ background: color-mix(in srgb, var(--critical) 14%, var(--surface)); color:var(--critical); }
+
+  /* ---------- target status text ---------- */
+  .target-status{ font-weight:700; }
+  .target-status.within{ color:var(--good); }
+  .target-status.below, .target-status.above{ color:var(--warning); }
+
+  .eyebrow-group{ margin:0 0 4px; }
 
   /* ---------- category bars + overview ---------- */
   .cat-overview{ display:grid; grid-template-columns: 1.3fr 1fr; gap:24px; align-items:start; }
@@ -252,7 +303,9 @@
   }
 
   @media print{
-    .toolbar .btn, .banner, .kpis, .filters-bar, section:has(#catGrid), section:has(#tableBody), section:has(#trainerBody){ display:none !important; }
+    .toolbar .btn, .banner, .action-bar, .filters-bar,
+    section:has(#kpis), section:has(#upcomingList),
+    section:has(#catGrid), section:has(#tableBody), section:has(#trainerBody){ display:none !important; }
     body{ padding:0 8px; }
     .planner-card{ box-shadow:none; border-color:#000; }
     .gantt{ min-width:0; }
@@ -309,8 +362,8 @@
       </div>
     </div>
     <p class="eyebrow">SafariCo Group &middot; Elewana Collection &amp; Explorer Collection</p>
-    <h1>2027 Training Calendar</h1>
-    <p class="subtitle">Group Learning &amp; Capability Development &mdash; live view of the 2027 training plan: dates, categories and people trained, drawn straight from the training log sheet.</p>
+    <h1>2027 Group Training Calendar</h1>
+    <p class="subtitle">Training scheduling, registration and operational planning across Elewana Collection &amp; Explorer Collection.</p>
     <div class="toolbar">
       <span class="pill snapshot" id="statusPill"><span class="dot"></span><span id="statusText">Loading…</span></span>
       <span class="section-note" id="updatedText"></span>
@@ -319,6 +372,15 @@
     </div>
     <div class="banner" id="banner"></div>
   </header>
+
+  <div class="action-bar">
+    <p>Find upcoming training, check your property&rsquo;s schedule and register your team.</p>
+    <div class="quick-actions">
+      <a class="btn btn-small" href="#upcomingSection">View upcoming training</a>
+      <a class="btn btn-small" href="#filtersBar">Find training</a>
+      <a class="btn btn-small" href="#plannerSection">View full year</a>
+    </div>
+  </div>
 
   <div class="filters-bar" id="filtersBar">
     <div class="filter-field">
@@ -338,18 +400,34 @@
       <select id="fCategory"><option value="">All categories</option></select>
     </div>
     <div class="filter-field">
-      <label for="fArea">Training type</label>
-      <select id="fArea"><option value="">All training types</option></select>
-    </div>
-    <div class="filter-field">
       <label for="fStatus">Status</label>
       <select id="fStatus"><option value="">All statuses</option></select>
     </div>
+    <button class="btn" id="moreFiltersBtn" type="button" aria-expanded="false">More filters</button>
     <button class="btn" id="clearFiltersBtn" type="button">Clear filters</button>
     <span class="section-note" id="filterSummary"></span>
+    <div class="more-filters-row" id="moreFiltersRow">
+      <div class="filter-field">
+        <label for="fArea">Training type</label>
+        <select id="fArea"><option value="">All training types</option></select>
+      </div>
+    </div>
   </div>
 
-  <section class="planner-section">
+  <section id="upcomingSection">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow small">What's next</p>
+        <h2>Upcoming Training</h2>
+      </div>
+      <span class="section-note" id="upcomingNote"></span>
+    </div>
+    <div class="card" style="padding:6px 18px;">
+      <div class="upcoming-list" id="upcomingList"></div>
+    </div>
+  </section>
+
+  <section class="planner-section" id="plannerSection">
     <div class="section-head">
       <div>
         <p class="eyebrow small">Year at a glance</p>
@@ -372,13 +450,21 @@
     </div>
   </section>
 
-  <section class="kpis" id="kpis"></section>
+  <section>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow small">At a glance</p>
+        <h2>Programme Overview</h2>
+      </div>
+    </div>
+    <div class="kpis" id="kpis"></div>
+  </section>
 
   <section>
     <div class="section-head">
       <div>
         <p class="eyebrow small">Policy GEN PROP-004</p>
-        <h2>Training by category</h2>
+        <h2>Learning Mix &amp; Policy Alignment</h2>
       </div>
       <span class="section-note">6 approved categories</span>
     </div>
@@ -414,7 +500,7 @@
           <thead>
             <tr>
               <th>Hosting venue</th><th>Department</th><th>Category</th><th>Training name</th><th>Dates</th>
-              <th>Trainer</th><th class="num">Attendees</th><th>Status</th><th>Attendance</th>
+              <th>Trainer</th><th class="num">Attendees</th><th>Status</th><th>Registration / Attendance</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
@@ -426,8 +512,8 @@
   <section>
     <div class="section-head">
       <div>
-        <p class="eyebrow small">Travel-time check</p>
-        <h2>Trainer workload</h2>
+        <p class="eyebrow small">Operational Planning</p>
+        <h2>Trainer Workload &amp; Travel</h2>
       </div>
       <span class="section-note" id="trainerNote"></span>
     </div>
@@ -445,9 +531,9 @@
   </section>
 
   <footer>
-    <p><strong>How this works:</strong> this page reads live from the Group Training &amp; Development team's master training log and refreshes automatically as dates are confirmed through the year. The people-trained totals above update once a session has actually taken place.</p>
-    <p>Kenya compliance dates (Fire Safety / Occupational Health &amp; Safety / First Aid, Feb&ndash;Mar 2027) are from the 2027 Training Budget workbook and marked <em>Planned</em> since they are suggested dates, not yet confirmed. Tanzania OSHA compliance dates follow the OSHA Annual OHS Training Calendar; a few still need exact dates confirmed in WIMS and show as &ldquo;Date TBC&rdquo; below until added. The other five approved categories (on-the-job coaching, SOP training, toolbox talks, online learning, workshops/formal sessions) are still to be added as they're scheduled.</p>
-    <p>Source: Group Learning &amp; Capability Development Policy (effective 11 Mar 2026) and SOP GEN PROP-004 (v01, 11 Mar 2026).</p>
+    <p><strong>Data source:</strong> Group Training &amp; Development Master Training Log 2027</p>
+    <p><strong>Framework:</strong> Group Learning &amp; Capability Development Policy (effective 11 Mar 2026) and SOP GEN PROP-004 (v01, 11 Mar 2026)</p>
+    <p><strong>Dashboard refresh:</strong> Live data refresh approximately every 5 minutes</p>
   </footer>
 </div>
 
@@ -473,6 +559,17 @@
   var ATTENDANCE_FORM_ENTRY = "entry.650248237";
   function attendanceLink(sessionId){
     return ATTENDANCE_FORM_BASE + "?usp=pp_url&" + ATTENDANCE_FORM_ENTRY + "=" + encodeURIComponent(sessionId);
+  }
+  // Same pre-filled form/Session ID mechanism, but the label and availability
+  // depend on where the session is in its lifecycle -- a GM registers a team
+  // for a session that hasn't happened yet, and records/reviews attendance
+  // once it has. Cancelled sessions get no action at all.
+  function sessionAction(r){
+    if(!r.id) return null;
+    var status = String(r.status || "").toLowerCase();
+    if(status === "cancelled") return null;
+    if(status === "completed") return {label:"Record attendance", href:attendanceLink(r.id)};
+    return {label:"Register team", href:attendanceLink(r.id)};
   }
 
   var YEAR = 2027;
@@ -642,8 +739,16 @@
         budget: num(r["Budget (USD)"]),
         status: r["Status"] || "Planned",
         notes: r["Notes"] || "",
-        conflict: /⚠/.test(r["Scheduling Conflict"] || "")
+        conflict: /⚠/.test(r["Scheduling Conflict"] || ""),
+        // Column S on the Training Log: once T&D reviews a flagged overlap
+        // and selects "Confirmed – Dates Correct", the clash is considered
+        // reviewed and intentionally accepted rather than an open risk.
+        tdReview: r["T&D Date Review"] || ""
       };
+    }).map(function(row){
+      row.tdConfirmed = row.conflict && /confirm/i.test(row.tdReview);
+      row.unresolvedConflict = row.conflict && !row.tdConfirmed;
+      return row;
     });
   }
 
@@ -734,6 +839,13 @@
       FILTER_FIELDS.forEach(function(f){ FILTERS[f.key] = ""; });
       render(lastAllRows, lastMeta);
     });
+    var moreBtn = document.getElementById("moreFiltersBtn");
+    var moreRow = document.getElementById("moreFiltersRow");
+    moreBtn.addEventListener("click", function(){
+      var showing = moreRow.classList.toggle("show");
+      moreBtn.setAttribute("aria-expanded", showing ? "true" : "false");
+      moreBtn.textContent = showing ? "Fewer filters" : "More filters";
+    });
   }
 
   // ---------- rendering ----------
@@ -746,6 +858,7 @@
     renderStatus(meta);
     populateFilters(rows);
     var filtered = applyFilters(rows);
+    renderUpcoming(filtered);
     renderKpis(filtered);
     renderCategories(filtered);
     renderCategoryDonut(filtered);
@@ -793,15 +906,20 @@
       if(r.attendeesPlanned || r.attendeesTrained) anyAttendance = true;
     });
 
-    var conflictCount = rows.filter(function(r){ return r.conflict; }).length;
+    // Only an unresolved (not yet T&D-confirmed) overlap counts as a review
+    // still required -- a clash T&D has looked at and accepted is no longer
+    // an open item, so it drops out of this count once confirmed.
+    var reviewsRequired = rows.filter(function(r){ return r.unresolvedConflict; }).length;
+    var totalHours = rows.reduce(function(sum, r){ return sum + r.totalHours; }, 0);
 
     var tiles = [
-      {label:"Training sessions", value: sessions.toLocaleString(), sub: propCount + " " + (propCount===1?"property":"properties") + " covered"},
+      {label:"Training sessions", value: sessions.toLocaleString(), sub: "Across " + propCount + " hosting " + (propCount===1?"property":"properties")},
+      {label:"Planned participants", value: planned.toLocaleString(), sub: "Across scheduled sessions"},
       {label:"People trained", value: anyAttendance ? trained.toLocaleString() : "—",
-        sub: anyAttendance ? ("of " + planned.toLocaleString() + " planned") : "Add attendee counts as sessions happen"},
-      {label:"Categories active", value: activeCategoryCount(rows) + " / 6", sub: "Approved learning categories in use"},
-      {label:"Possible double-bookings", value: conflictCount.toLocaleString(),
-        sub: conflictCount ? "Same department, overlapping dates — see red rows below" : "None flagged", warn: conflictCount > 0}
+        sub: anyAttendance ? (trained.toLocaleString() + " of " + planned.toLocaleString() + " planned") : "Not yet recorded"},
+      {label:"Scheduled training hours", value: Math.round(totalHours).toLocaleString(), sub: "Individual hrs \u00d7 attendees planned"},
+      {label:"Scheduling reviews required", value: reviewsRequired.toLocaleString(),
+        sub: reviewsRequired ? "Unresolved overlaps awaiting T&D review" : "None outstanding", warn: reviewsRequired > 0}
     ];
     document.getElementById("kpis").innerHTML = tiles.map(function(t){
       return '<div class="kpi'+(t.warn?' kpi-warn':'')+'"><div class="stat-label">'+esc(t.label)+'</div>'+
@@ -814,6 +932,37 @@
     var set = {};
     rows.forEach(function(r){ if(r.category) set[r.category] = true; });
     return Object.keys(set).length;
+  }
+
+  // Compact, date-sorted quick-action list for GMs -- the next handful of
+  // sessions that haven't happened yet, each with a direct register/attend
+  // action so a GM never has to open the full table below.
+  function renderUpcoming(rows){
+    var list = document.getElementById("upcomingList");
+    var note = document.getElementById("upcomingNote");
+    var upcoming = rows.filter(function(r){
+      return r.start && String(r.status).toLowerCase() !== "cancelled";
+    }).slice().sort(function(a,b){ return a.start - b.start; }).slice(0, 8);
+    var undated = rows.filter(function(r){ return !r.start && String(r.status).toLowerCase() !== "cancelled"; }).length;
+    if(!upcoming.length){
+      list.innerHTML = '<div class="empty">No upcoming sessions match the current filters.</div>';
+      note.textContent = "";
+      return;
+    }
+    note.textContent = "Next " + upcoming.length + " session" + (upcoming.length===1?"":"s") +
+      (undated ? " · " + undated + " more awaiting confirmed dates" : "");
+    list.innerHTML = upcoming.map(function(r){
+      var dateStr = fmtDate(r.start) + (r.end && r.end.getTime()!==r.start.getTime() ? (" – " + fmtDate(r.end)) : "");
+      var statusClass = String(r.status).toLowerCase();
+      var action = sessionAction(r);
+      return '<div class="upcoming-row">' +
+        '<div class="u-date">' + esc(fmtDate(r.start)).split(" ").join("<br>") + '</div>' +
+        '<div class="u-main"><div class="u-title">' + esc(r.area || r.category) + '</div>' +
+        '<div class="u-sub">' + esc(r.property) + (r.participatingProperty ? " · " + esc(r.participatingProperty) : "") + '</div></div>' +
+        '<div class="u-status"><span class="status-pill ' + esc(statusClass) + '">' + esc(r.status) + '</span></div>' +
+        '<div class="u-action">' + (action ? '<a class="btn btn-small" href="' + esc(action.href) + '" target="_blank" rel="noopener">' + esc(action.label) + ' &#8599;</a>' : '<span class="muted-cell">&mdash;</span>') + '</div>' +
+        '</div>';
+    }).join("");
   }
 
   function renderCategories(rows){
@@ -834,15 +983,19 @@
       var meta = CAT_META[name];
       var bandHtml = "";
       var targetText = "";
+      var statusHtml = "";
       if(meta && meta.max != null){
         var bMin = meta.min || 0;
         bandHtml = '<div class="cat-target" style="left:'+bMin+'%;width:'+(meta.max-bMin)+'%"></div>';
         targetText = " (target " + (bMin ? (bMin + "–" + meta.max) : ("≤" + meta.max)) + "%)";
+        var statusWord = share < bMin ? "Below target" : (share > meta.max ? "Above target" : "Within target");
+        var statusCls = share < bMin ? "below" : (share > meta.max ? "above" : "within");
+        statusHtml = ' &middot; <span class="target-status '+statusCls+'">'+statusWord+'</span>';
       }
       return '<div class="cat-row">'+
         '<div class="cat-name"><span class="cat-swatch" style="background:var('+colorVar+')"></span>'+esc(name)+'</div>'+
         '<div class="cat-track">'+bandHtml+'<div class="cat-fill" style="width:'+share+'%;background:var('+colorVar+')"></div></div>'+
-        '<div class="cat-figure">'+count+' '+(count===1?"session":"sessions")+' · '+share+'%'+esc(targetText)+'</div>'+
+        '<div class="cat-figure">'+count+' '+(count===1?"session":"sessions")+' · '+share+'%'+esc(targetText)+statusHtml+'</div>'+
         '</div>';
     }).join("");
   }
@@ -960,10 +1113,16 @@
       var p = byProp[r.property];
       if(r.start < p.earliest) p.earliest = r.start;
       var key = r.start.getTime()+"_"+r.end.getTime();
-      if(!p.segments[key]) p.segments[key] = {start:r.start, end:r.end, areas:[], categories:{}, statuses:{}, openToAll:false};
-      p.segments[key].areas.push(r.area || r.category);
-      p.segments[key].categories[r.category] = true;
-      p.segments[key].statuses[r.status || "Planned"] = true;
+      if(!p.segments[key]) p.segments[key] = {start:r.start, end:r.end, areas:[], categories:{}, statuses:{}, openToAll:false, trainers:[], participants:[], attendeesPlanned:0, unresolvedConflict:false, tdConfirmed:false};
+      var seg = p.segments[key];
+      seg.areas.push(r.area || r.category);
+      seg.categories[r.category] = true;
+      seg.statuses[r.status || "Planned"] = true;
+      if(r.trainer) seg.trainers.push(r.trainer);
+      if(r.participatingProperty) seg.participants.push(r.participatingProperty);
+      seg.attendeesPlanned += r.attendeesPlanned;
+      if(r.unresolvedConflict) seg.unresolvedConflict = true;
+      if(r.tdConfirmed) seg.tdConfirmed = true;
       if(String(r.participatingProperty || "").toUpperCase() === "ALL") p.segments[key].openToAll = true;
     });
     order.sort(function(a,b){ return byProp[a].earliest - byProp[b].earliest; });
@@ -994,7 +1153,17 @@
         var statusLabel = Object.keys(s.statuses).join(", ");
         var uniqueAreas = uniqList(s.areas);
         var trainingName = uniqueAreas.join(", ");
-        var label = esc(prop) + "<br>" + esc(trainingName) + "<br>" + esc(fmtDate(s.start)) + (s.end.getTime()!==s.start.getTime() ? (" – " + esc(fmtDate(s.end))) : "") + "<br>" + esc(statusLabel) + (s.openToAll ? "<br>Open to all properties" : "");
+        var uniqueTrainers = uniqList(s.trainers);
+        var uniqueParticipants = uniqList(s.participants);
+        var label = "<b>" + esc(trainingName) + "</b>" +
+          "Hosting: " + esc(prop) + "<br>" +
+          "Participating: " + esc(s.openToAll ? "All properties" : (uniqueParticipants.join(", ") || prop)) + "<br>" +
+          "Start: " + esc(fmtDate(s.start)) + "<br>" +
+          "End: " + esc(fmtDate(s.end)) + "<br>" +
+          "Trainer: " + esc(uniqueTrainers.join(", ") || "TBC") + "<br>" +
+          "Status: " + esc(statusLabel) + "<br>" +
+          "Planned participants: " + esc(s.attendeesPlanned || "—") +
+          (s.unresolvedConflict ? "<br>⚠ Pending T&D review" : "");
         var barHtml = '<div class="bar '+statusCls+'" data-tt="'+label+'" data-idx="'+idx+'" style="left:'+left+'%;width:'+width+'%;background-color:var('+colorVar+')"></div>';
         // The training name is printed beside the bar itself (not just in the
         // hover tooltip) so the chart is readable without hovering -- a
@@ -1102,8 +1271,11 @@
         (r.attendeesTrained || "0") + " / " + (r.attendeesPlanned || "—") :
         '<span class="muted-cell">not recorded</span>';
       var statusClass = String(r.status).toLowerCase();
-      return '<tr'+(r.conflict?' class="conflict-row" title="Possible double-booking: this department already has a session on an overlapping date at this property"':'')+'>'+
-        '<td>'+(r.conflict?'<span aria-hidden="true">⚠️ </span>':'')+esc(r.property)+'</td>'+
+      var tdBadge = r.unresolvedConflict ? ' <span class="td-badge pending">⚠ Pending T&amp;D Review</span>' : "";
+      var action = sessionAction(r);
+      var propTitle = r.participatingProperty ? ("Participating: " + r.participatingProperty) : "";
+      return '<tr'+(r.unresolvedConflict?' class="conflict-row" title="Possible double-booking: this department already has a session on an overlapping date at this property"':'')+'>'+
+        '<td'+(propTitle?' title="'+esc(propTitle)+'"':'')+'>'+(r.unresolvedConflict?'<span aria-hidden="true">⚠️ </span>':'')+esc(r.property)+tdBadge+'</td>'+
         '<td>'+(r.department ? esc(r.department) : '<span class="muted-cell">&mdash;</span>')+'</td>'+
         '<td><span class="tag"><span class="cat-swatch" style="background:var('+colorVar+')"></span>'+esc(r.category)+'</span></td>'+
         '<td>'+esc(r.area)+'</td>'+
@@ -1111,7 +1283,7 @@
         '<td>'+(r.trainer ? esc(r.trainer) : '<span class="muted-cell">TBC</span>')+'</td>'+
         '<td class="num">'+attendance+'</td>'+
         '<td><span class="status-pill '+esc(statusClass)+'">'+esc(r.status)+'</span></td>'+
-        '<td>'+(r.id ? '<a class="btn btn-small" href="'+esc(attendanceLink(r.id))+'" target="_blank" rel="noopener">Record attendance &#8599;</a>' : '<span class="muted-cell">&mdash;</span>')+'</td>'+
+        '<td>'+(action ? '<a class="btn btn-small" href="'+esc(action.href)+'" target="_blank" rel="noopener">'+esc(action.label)+' &#8599;</a>' : '<span class="muted-cell">&mdash;</span>')+'</td>'+
         '</tr>';
     }).join("");
   }
