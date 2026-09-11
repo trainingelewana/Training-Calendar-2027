@@ -282,8 +282,10 @@
   .gantt-row .row-label .country{ display:block; font-size:10.5px; font-weight:500; color:var(--muted); }
   .track{
     position:relative; height:36px;
-    background-image:
-      repeating-linear-gradient(to right, var(--baseline) 0, var(--baseline) 1.5px, transparent 1.5px, transparent calc(100%/12));
+    /* Month divider lines are set inline per-row in JS, built from the
+       exact same cumulative month widths as the header, so they always
+       land in the same place as the month boundaries above -- not a fixed
+       twelfths split, since months aren't equal length. */
   }
   .bar{
     position:absolute; top:50%; transform:translateY(-50%); height:15px; border-radius:3px; min-width:13px;
@@ -559,15 +561,14 @@
   function attendanceLink(sessionId){
     return ATTENDANCE_FORM_BASE + "?usp=pp_url&" + ATTENDANCE_FORM_ENTRY + "=" + encodeURIComponent(sessionId);
   }
-  // Same pre-filled form/Session ID mechanism, but the label and availability
-  // depend on where the session is in its lifecycle -- a GM registers a team
-  // for a session that hasn't happened yet, and records/reviews attendance
-  // once it has. Cancelled sessions get no action at all.
+  // Same pre-filled form/Session ID mechanism as always -- the form itself
+  // captures the team's attendee list for a session (see the sheet's own
+  // Attendance Register tab), whether that's submitted before or after the
+  // session happens, so one consistent "Register team" label is more
+  // honest than pretending it's two different actions.
   function sessionAction(r){
     if(!r.id) return null;
-    var status = String(r.status || "").toLowerCase();
-    if(status === "cancelled") return null;
-    if(status === "completed") return {label:"Record attendance", href:attendanceLink(r.id)};
+    if(String(r.status || "").toLowerCase() === "cancelled") return null;
     return {label:"Register team", href:attendanceLink(r.id)};
   }
 
@@ -1161,6 +1162,20 @@
       }).join("") +
       '</div></div>';
 
+    // The month headers above are sized by actual days-in-month (28-31 days),
+    // not equal twelfths -- so the faint divider lines behind each row must
+    // be built from the SAME cumulative widths, or they drift out of step
+    // with the header the further right you go. Built once here and applied
+    // as an inline background on every row's track so both are guaranteed
+    // to match pixel-for-pixel, rather than relying on a separate CSS
+    // repeating-gradient that assumed 12 equal columns.
+    var cum = 0, monthLineStops = [];
+    for(var mb=0; mb<11; mb++){
+      cum += monthWidths[mb];
+      monthLineStops.push('transparent '+cum+'%, var(--baseline) '+cum+'%, var(--baseline) calc('+cum+'% + 1px), transparent calc('+cum+'% + 1px)');
+    }
+    var trackGridStyle = 'background-image:linear-gradient(to right, '+monthLineStops.join(', ')+');';
+
     var rowsHtml = order.map(function(prop){
       var p = byProp[prop];
       var segs = Object.keys(p.segments).map(function(k){ return p.segments[k]; });
@@ -1196,7 +1211,7 @@
         return barHtml + labelHtml;
       }).join("");
       return '<div class="gantt-row"><div class="row-label">'+esc(prop)+'<span class="country">'+esc(p.country)+'</span></div>'+
-        '<div class="track">'+bars+'</div></div>';
+        '<div class="track" style="'+trackGridStyle+'">'+bars+'</div></div>';
     }).join("");
 
     wrap.innerHTML = monthsHtml + '<div class="gantt-body">' + rowsHtml + '</div>';
