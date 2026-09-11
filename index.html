@@ -377,7 +377,6 @@
     <p>Find upcoming training, check your property&rsquo;s schedule and register your team.</p>
     <div class="quick-actions">
       <a class="btn btn-small" href="#upcomingSection">View upcoming training</a>
-      <a class="btn btn-small" href="#filtersBar">Find training</a>
       <a class="btn btn-small" href="#plannerSection">View full year</a>
     </div>
   </div>
@@ -500,7 +499,7 @@
           <thead>
             <tr>
               <th>Hosting venue</th><th>Department</th><th>Category</th><th>Training name</th><th>Dates</th>
-              <th>Trainer</th><th class="num">Attendees</th><th>Status</th><th>Registration / Attendance</th>
+              <th>Trainer</th><th class="num">Attendees</th><th>Status</th><th>Registration / Attendance</th><th>Report</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
@@ -710,6 +709,24 @@
     return alias || p;
   }
 
+  // Winnie's sheet adds instructional text into the header cell itself
+  // ("Training Report Links  (Please keep raw links and do not chip the
+  // link...)"), so this matches on the start of the header rather than an
+  // exact string -- the column still gets picked up even if that
+  // instructional wording is edited later. Only a genuine http(s) link is
+  // used; a blank cell or stray note is treated as "no report yet".
+  function findReportLink(r){
+    var keys = Object.keys(r);
+    for(var i=0;i<keys.length;i++){
+      if(/^training report link/i.test(keys[i])){
+        var val = String(r[keys[i]] || "").trim();
+        if(/^https?:\/\//i.test(val)) return val;
+        return "";
+      }
+    }
+    return "";
+  }
+
   function normalize(rows){
     // Note: rows without a parseable date are kept (shown as "Date TBC" in
     // KPIs and the session table) rather than dropped here — only the
@@ -743,7 +760,10 @@
         // Column S on the Training Log: once T&D reviews a flagged overlap
         // and selects "Confirmed – Dates Correct", the clash is considered
         // reviewed and intentionally accepted rather than an open risk.
-        tdReview: r["T&D Date Review"] || ""
+        tdReview: r["T&D Date Review"] || "",
+        // Column T: the final training report for that session, once T&D
+        // has filed one -- a plain URL, not a Sheets link-chip.
+        reportLink: findReportLink(r)
       };
     }).map(function(row){
       row.tdConfirmed = row.conflict && /confirm/i.test(row.tdReview);
@@ -1284,6 +1304,7 @@
         '<td class="num">'+attendance+'</td>'+
         '<td><span class="status-pill '+esc(statusClass)+'">'+esc(r.status)+'</span></td>'+
         '<td>'+(action ? '<a class="btn btn-small" href="'+esc(action.href)+'" target="_blank" rel="noopener">'+esc(action.label)+' &#8599;</a>' : '<span class="muted-cell">&mdash;</span>')+'</td>'+
+        '<td>'+(r.reportLink ? '<a class="btn btn-small" href="'+esc(r.reportLink)+'" target="_blank" rel="noopener">View report &#8599;</a>' : '<span class="muted-cell">&mdash;</span>')+'</td>'+
         '</tr>';
     }).join("");
   }
