@@ -7,7 +7,7 @@
     color-scheme: light;
     --page:#f7f6f3; --surface:#ffffff; --surface-2:#f0efed;
     --text-primary:#2e2b28; --text-secondary:#6b6e6e; --muted:#8d9090;
-    --grid:#e8e8e7; --baseline:#d4d3d2; --border:rgba(46,43,40,0.13);
+    --grid:#e8e8e7; --baseline:#d4d3d2; --gantt-line:#dcdbd8; --border:rgba(46,43,40,0.13);
     --accent:#bd9a5e; --accent-text:#7a5e2c; --accent-fg:#2e2b28; --accent-soft:#f5eee0; --accent-soft-border:#e3d2ac;
     --good:#2f6b4f; --warning:#a9762e; --serious:#9c5a2e; --critical:#b5562b;
     --slot1:#4f6f63; --slot2:#9c6b3f; --slot3:#5b7a94; --slot4:#8c5a3c; --slot5:#6e7d4f; --slot6:#7c6a8c;
@@ -20,7 +20,7 @@
       color-scheme: dark;
       --page:#1b1917; --surface:#242019; --surface-2:#2e2921;
       --text-primary:#f2eee6; --text-secondary:#c9c0b0; --muted:#948c7d;
-      --grid:#34302a; --baseline:#433d34; --border:rgba(242,238,230,0.12);
+      --grid:#34302a; --baseline:#433d34; --gantt-line:#3b362e; --border:rgba(242,238,230,0.12);
       --accent:#d4b580; --accent-text:#d9be8c; --accent-fg:#241d0f; --accent-soft:#332b1c; --accent-soft-border:#4a3d24;
       --good:#5fa382; --warning:#c99a4c; --serious:#c2794a; --critical:#d07856;
       --slot1:#6e9686; --slot2:#cc9558; --slot3:#86a3bc; --slot4:#b98268; --slot5:#9aa97a; --slot6:#a794b6;
@@ -33,7 +33,7 @@
     color-scheme: dark;
     --page:#1b1917; --surface:#242019; --surface-2:#2e2921;
     --text-primary:#f2eee6; --text-secondary:#c9c0b0; --muted:#948c7d;
-    --grid:#34302a; --baseline:#433d34; --border:rgba(242,238,230,0.12);
+    --grid:#34302a; --baseline:#433d34; --gantt-line:#3b362e; --border:rgba(242,238,230,0.12);
     --accent:#d4b580; --accent-text:#d9be8c; --accent-fg:#241d0f; --accent-soft:#332b1c; --accent-soft-border:#4a3d24;
     --good:#5fa382; --warning:#c99a4c; --serious:#c2794a; --critical:#d07856;
     --slot1:#6e9686; --slot2:#cc9558; --slot3:#86a3bc; --slot4:#b98268; --slot5:#9aa97a; --slot6:#a794b6;
@@ -115,7 +115,7 @@
 
   /* ---------- KPIs ---------- */
   .kpis{
-    display:grid; grid-template-columns:repeat(5,1fr); margin-bottom:28px;
+    display:grid; grid-template-columns:repeat(5,1fr); margin-bottom:40px;
     background:var(--surface); border:1px solid var(--border); border-radius:14px;
     box-shadow:var(--shadow); overflow:hidden;
   }
@@ -145,8 +145,8 @@
   .kpi.kpi-warn .stat-value{ color:var(--critical); }
   .kpi .stat-sub{ font-size:12.5px; color:var(--text-secondary); margin-top:5px; }
 
-  section{ margin-bottom:34px; }
-  .section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:12px; flex-wrap:wrap;}
+  section{ margin-bottom:40px; }
+  .section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap;}
   h2{ font-size:19px; font-weight:700; margin:0; }
   .section-note{ font-size:12.5px; color:var(--muted); }
 
@@ -157,10 +157,11 @@
 
   /* ---------- filters ---------- */
   .filters-bar{
-    display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px 14px; margin-bottom:22px;
+    display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px 16px; margin-bottom:28px;
     padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow);
   }
-  .filter-field{ display:flex; flex-direction:column; gap:4px; min-width:148px; flex:1 1 148px; }
+  .filter-field{ display:flex; flex-direction:column; gap:5px; min-width:0; flex:1 1 172px; max-width:232px; }
+  .filter-field select{ width:100%; }
   .filter-field label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
   .filter-field select{
     font:inherit; font-size:13px; padding:7px 9px; border-radius:8px; border:1px solid var(--border);
@@ -207,9 +208,11 @@
   /* ---------- category bars + overview ---------- */
   .cat-overview{ display:grid; grid-template-columns: 1.3fr 1fr; gap:24px; align-items:start; }
   @media (max-width:820px){ .cat-overview{ grid-template-columns:1fr; } }
-  .cat-grid{ display:grid; grid-template-columns: 1fr; gap:14px; }
+  .cat-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:16px 26px; }
   .cat-row{ padding:2px 0; }
-  .cat-name{ font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .cat-name{ font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; margin-bottom:6px; min-width:0; }
+  .cat-name .cat-label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cat-name .cat-pct{ margin-left:auto; font-variant-numeric:tabular-nums; font-weight:700; color:var(--text-secondary); }
   .cat-swatch{ width:10px; height:10px; border-radius:3px; flex:none; }
   .cat-track{ position:relative; height:10px; border-radius:6px; background:var(--grid); overflow:hidden; }
   .cat-fill{ height:100%; border-radius:6px; position:relative; z-index:1; }
@@ -246,7 +249,7 @@
 
   /* ---------- year planner (hero gantt) ---------- */
   .eyebrow.small{ margin:0 0 3px; font-size:11px; }
-  .planner-section{ margin-top:8px; }
+  .planner-section{ margin-top:0; }
   .planner-card{
     padding:22px 22px 16px; box-shadow:var(--shadow-hero);
     border-top:3px solid var(--accent); border-radius:14px;
@@ -261,30 +264,36 @@
   .bar-sample.bar-cancelled{ background-color:transparent; border:1.5px dashed var(--muted); }
   .gantt-scroll{ overflow-x:auto; }
   .gantt{ min-width:920px; }
-  .gantt-months{ display:grid; grid-template-columns: 160px 1fr; margin-bottom:6px; }
+  .gantt-months{ display:grid; grid-template-columns: 190px 1fr; margin-bottom:6px; }
   .gantt-months .row-label{ }
-  .month-track{ display:flex; }
+  .month-track{ display:flex; border-right:1px solid var(--gantt-line); }
   .month-cell{
     flex:none; text-align:center; font-size:11.5px; font-weight:700; color:var(--text-secondary);
-    text-transform:uppercase; letter-spacing:.05em; border-left:2px solid var(--text-secondary); padding-bottom:8px;
+    text-transform:uppercase; letter-spacing:.05em; border-left:1px solid var(--gantt-line); padding-bottom:8px;
   }
-  .month-cell:first-child{ border-left:none; }
   .gantt-body{ border-top:2px solid var(--baseline); }
   .gantt-row{
-    display:grid; grid-template-columns: 160px 1fr; align-items:center;
+    display:grid; grid-template-columns: 190px 1fr; align-items:stretch;
     border-bottom:1px solid var(--grid); min-height:36px;
+    background: var(--surface-2);
   }
-  .gantt-row:nth-child(even){ background: color-mix(in srgb, var(--surface-2) 55%, transparent); }
   .gantt-row .row-label{
-    font-size:13px; font-weight:700; padding-right:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    align-self:center;
+    font-size:13px; font-weight:700; padding-right:14px; line-height:1.25; overflow:hidden; text-overflow:ellipsis;
   }
   .gantt-row .row-label .country{ display:block; font-size:10.5px; font-weight:500; color:var(--muted); }
+  .lanes{
+    display:flex; flex-direction:column; justify-content:center; gap:2px; padding:2px 0;
+  }
   .track{
     position:relative; height:36px;
     /* Month divider lines are set inline per-row in JS, built from the
        exact same cumulative month widths as the header, so they always
        land in the same place as the month boundaries above -- not a fixed
-       twelfths split, since months aren't equal length. */
+       twelfths split, since months aren't equal length. A venue with two
+       sessions close together in time gets a second .track stacked below
+       the first (see assignLanes in renderGantt) instead of both bars
+       landing in the same place. */
   }
   .bar{
     position:absolute; top:50%; transform:translateY(-50%); height:15px; border-radius:3px; min-width:13px;
@@ -301,6 +310,11 @@
   .bar-label{
     position:absolute; top:50%; transform:translateY(-50%); font-size:11px; font-weight:600; color:var(--text-secondary);
     white-space:nowrap; cursor:default; overflow:hidden; text-overflow:ellipsis;
+    /* The month divider lines are painted as the track's background, so a
+       label with a transparent background lets a line run straight through
+       its letters. Filling the label with the row colour (plus a little
+       breathing room) means the lines always stop at the writing. */
+    background:var(--surface-2); padding:1px 4px; border-radius:2px; z-index:2;
   }
 
   @media print{
@@ -330,8 +344,48 @@
     font-weight:700; padding:0 10px 8px; border-bottom:1px solid var(--grid); white-space:nowrap;
   }
   td{ padding:9px 10px; border-bottom:1px solid var(--grid); vertical-align:top; }
+  /* The session list runs to a hundred-plus rows; capping it and scrolling
+     inside the card keeps the page navigable, and a sticky header row means
+     the column meaning never scrolls out of sight. */
+  .table-scroll.tall{ max-height:72vh; overflow:auto; }
+  .table-scroll.tall.compact{ max-height:46vh; }
+
+  /* Secondary, T&D-facing detail: present but folded away by default so the
+     dashboard opens on what a GM / ops / director audience actually needs. */
+  .collapse-block{ border:0; }
+  .collapse-block > summary{
+    display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    margin-bottom:14px; cursor:pointer; list-style:none;
+  }
+  .collapse-block > summary::-webkit-details-marker{ display:none; }
+  .collapse-block > summary:focus-visible{ outline:2px solid var(--accent); outline-offset:4px; border-radius:6px; }
+  .collapse-hint{
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--accent-text); display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+  .collapse-hint::before{ content:"Show"; }
+  .collapse-block[open] > summary .collapse-hint::before{ content:"Hide"; }
+  .collapse-hint::after{
+    content:""; width:6px; height:6px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor;
+    transform:rotate(45deg); transition:transform .15s ease; margin-top:-3px;
+  }
+  .collapse-block[open] > summary .collapse-hint::after{ transform:rotate(-135deg); margin-top:2px; }
+  .table-scroll.tall thead th{
+    position:sticky; top:0; z-index:3; background:var(--surface);
+    padding:10px 10px 8px; box-shadow: inset 0 -1px 0 var(--grid);
+  }
+  tr.month-sep td{
+    position:sticky; top:35px; z-index:2;
+    background:var(--surface-2); border-bottom:1px solid var(--baseline);
+    font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--text-secondary); padding:6px 10px;
+  }
+  /* A value identical to the row above is dropped back visually so the eye
+     reads change down the column instead of a wall of repeated words. */
+  td.repeat-cell{ color:var(--muted); }
+  td.repeat-cell .tag{ opacity:.5; }
   tbody tr:last-child td{ border-bottom:none; }
-  tbody tr:nth-child(even){ background: color-mix(in srgb, var(--surface-2) 45%, transparent); }
+  tbody tr:nth-child(even){ background: color-mix(in srgb, var(--surface-2) 75%, transparent); }
   tr.conflict-row td{ background: color-mix(in srgb, var(--critical) 8%, transparent); }
   .tag{
     display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; white-space:nowrap;
@@ -495,7 +549,7 @@
       <span class="section-note" id="tableNote"></span>
     </div>
     <div class="card" style="padding:0;">
-      <div class="table-scroll">
+      <div class="table-scroll tall">
         <table>
           <thead>
             <tr>
@@ -510,24 +564,27 @@
   </section>
 
   <section>
-    <div class="section-head">
-      <div>
-        <p class="eyebrow small">Operational Planning</p>
-        <h2>Trainer Workload &amp; Travel</h2>
+    <details class="collapse-block" id="trainerDetails">
+      <summary>
+        <div>
+          <p class="eyebrow small">Operational Planning</p>
+          <h2>Trainer Workload &amp; Travel</h2>
+        </div>
+        <span class="section-note" id="trainerNote"></span>
+        <span class="collapse-hint" aria-hidden="true"></span>
+      </summary>
+      <div class="card" style="padding:0;">
+        <div class="table-scroll tall compact">
+          <table>
+            <thead>
+              <tr><th>Trainer</th><th class="num">Sessions</th><th>Properties</th><th>Scheduled span</th></tr>
+            </thead>
+            <tbody id="trainerBody"></tbody>
+          </table>
+        </div>
       </div>
-      <span class="section-note" id="trainerNote"></span>
-    </div>
-    <div class="card" style="padding:0;">
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr><th>Trainer</th><th class="num">Sessions</th><th>Properties</th><th>Scheduled span</th></tr>
-          </thead>
-          <tbody id="trainerBody"></tbody>
-        </table>
-      </div>
-    </div>
-    <p class="legend-note">Flags a trainer with less than 3 days between finishing at one property and starting at another &mdash; a rough proxy for travel time between properties; use your own judgement for properties that are close together.</p>
+      <p class="legend-note">Flags a trainer with less than 3 days between finishing at one property and starting at another &mdash; a rough proxy for travel time between properties; use your own judgement for properties that are close together.</p>
+    </details>
   </section>
 
   <footer>
@@ -1013,7 +1070,7 @@
         statusHtml = ' &middot; <span class="target-status '+statusCls+'">'+statusWord+'</span>';
       }
       return '<div class="cat-row">'+
-        '<div class="cat-name"><span class="cat-swatch" style="background:var('+colorVar+')"></span>'+esc(name)+'</div>'+
+        '<div class="cat-name"><span class="cat-swatch" style="background:var('+colorVar+')"></span><span class="cat-label">'+esc(name)+'</span><span class="cat-pct">'+share+'%</span></div>'+
         '<div class="cat-track">'+bandHtml+'<div class="cat-fill" style="width:'+share+'%;background:var('+colorVar+')"></div></div>'+
         '<div class="cat-figure">'+count+' '+(count===1?"session":"sessions")+' · '+share+'%'+esc(targetText)+statusHtml+'</div>'+
         '</div>';
@@ -1167,49 +1224,88 @@
     // as an inline background on every row's track so both are guaranteed
     // to match pixel-for-pixel, rather than relying on a separate CSS
     // repeating-gradient that assumed 12 equal columns.
-    var cum = 0, monthLineStops = [];
+    // Lines at 0% (start of January) and at every month boundary, plus one
+    // closing line at the right edge, so the grid reads as a complete frame
+    // rather than a set of columns missing its first and last rule.
+    var cum = 0, monthLineStops = ['var(--gantt-line) 0, var(--gantt-line) 1px, transparent 1px'];
     for(var mb=0; mb<11; mb++){
       cum += monthWidths[mb];
-      monthLineStops.push('transparent '+cum+'%, var(--text-secondary) '+cum+'%, var(--text-secondary) calc('+cum+'% + 1.5px), transparent calc('+cum+'% + 1.5px)');
+      monthLineStops.push('transparent '+cum+'%, var(--gantt-line) '+cum+'%, var(--gantt-line) calc('+cum+'% + 1px), transparent calc('+cum+'% + 1px)');
     }
+    monthLineStops.push('transparent calc(100% - 1px), var(--gantt-line) calc(100% - 1px), var(--gantt-line) 100%');
     var trackGridStyle = 'background-image:linear-gradient(to right, '+monthLineStops.join(', ')+');';
+
+    // Two sessions at the same venue can fall close together in time (or
+    // genuinely overlap). With everything pinned to one track by date alone,
+    // their bars/icons would land on top of each other and the labels beside
+    // them would collide -- which is exactly the "writing is overflowing"
+    // look Winnie flagged. So sessions are first split into lanes: a session
+    // only shares a lane with an earlier one if there's a real gap (>= 5
+    // days, roughly the width a bar's own minimum size already occupies)
+    // between them; otherwise it drops to a new lane. Each lane renders as
+    // its own .track, so positionBarLabels (which already runs per .track)
+    // keeps label collisions handled within a lane, and lanes stack so nothing
+    // from different lanes can ever overlap.
+    var MIN_LANE_GAP_DAYS = 5;
+    function assignLanes(segs){
+      var sorted = segs.slice().sort(function(a,b){ return a.start - b.start; });
+      var lanes = []; // each entry: {lastEnd: Date, items: [seg,...]}
+      sorted.forEach(function(seg){
+        var placed = false;
+        for(var i=0;i<lanes.length;i++){
+          var gapDays = (seg.start - lanes[i].lastEnd) / 86400000;
+          if(gapDays >= MIN_LANE_GAP_DAYS){
+            lanes[i].items.push(seg);
+            lanes[i].lastEnd = seg.end > lanes[i].lastEnd ? seg.end : lanes[i].lastEnd;
+            placed = true;
+            break;
+          }
+        }
+        if(!placed) lanes.push({lastEnd:seg.end, items:[seg]});
+      });
+      return lanes.map(function(l){ return l.items; });
+    }
 
     var rowsHtml = order.map(function(prop){
       var p = byProp[prop];
       var segs = Object.keys(p.segments).map(function(k){ return p.segments[k]; });
-      var bars = segs.map(function(s, idx){
-        var left = dayOfYear(s.start)/YEAR_DAYS*100;
-        var width = Math.max((dayOfYear(s.end)-dayOfYear(s.start)+1)/YEAR_DAYS*100, 0.9);
-        var catNames = Object.keys(s.categories);
-        var colorVar = CAT_COLOR[catNames[0]] || FALLBACK_COLOR;
-        var statusCls = statusClassFor(s.statuses);
-        var statusLabel = Object.keys(s.statuses).join(", ");
-        var uniqueAreas = uniqList(s.areas);
-        var trainingName = uniqueAreas.join(", ");
-        var uniqueTrainers = uniqList(s.trainers);
-        var uniqueParticipants = uniqList(s.participants);
-        var label = "<b>" + esc(trainingName) + "</b>" +
-          "Hosting: " + esc(prop) + "<br>" +
-          "Participating: " + esc(s.openToAll ? "All properties" : (uniqueParticipants.join(", ") || prop)) + "<br>" +
-          "Start: " + esc(fmtDate(s.start)) + "<br>" +
-          "End: " + esc(fmtDate(s.end)) + "<br>" +
-          "Trainer: " + esc(uniqueTrainers.join(", ") || "TBC") + "<br>" +
-          "Status: " + esc(statusLabel) + "<br>" +
-          "Planned participants: " + esc(s.attendeesPlanned || "—") +
-          (s.unresolvedConflict ? "<br>⚠ Pending T&D review" : "");
-        var barHtml = '<div class="bar '+statusCls+'" data-tt="'+label+'" data-idx="'+idx+'" style="left:'+left+'%;width:'+width+'%;background-color:var('+colorVar+')"></div>';
-        // The training name is printed beside the bar itself (not just in the
-        // hover tooltip) so the chart is readable without hovering -- a
-        // hosting venue on its own (e.g. "Moshi") doesn't say what's running.
-        // The inline left below is a reasonable starting guess (bar's own
-        // start plus its approximate rendered width) so the label is never
-        // badly placed even before layout runs; positionBarLabels then
-        // corrects it to the bar's *actual* rendered right edge in pixels.
-        var labelHtml = '<div class="bar-label" data-tt="'+label+'" data-idx="'+idx+'" style="left:calc('+left+'% + 18px)">'+esc(truncateLabel(trainingName, 46))+'</div>';
-        return barHtml + labelHtml;
+      var lanes = assignLanes(segs);
+      var lanesHtml = lanes.map(function(laneSegs){
+        var bars = laneSegs.map(function(s, idx){
+          var left = dayOfYear(s.start)/YEAR_DAYS*100;
+          var width = Math.max((dayOfYear(s.end)-dayOfYear(s.start)+1)/YEAR_DAYS*100, 0.9);
+          var catNames = Object.keys(s.categories);
+          var colorVar = CAT_COLOR[catNames[0]] || FALLBACK_COLOR;
+          var statusCls = statusClassFor(s.statuses);
+          var statusLabel = Object.keys(s.statuses).join(", ");
+          var uniqueAreas = uniqList(s.areas);
+          var trainingName = uniqueAreas.join(", ");
+          var uniqueTrainers = uniqList(s.trainers);
+          var uniqueParticipants = uniqList(s.participants);
+          var label = "<b>" + esc(trainingName) + "</b>" +
+            "Hosting: " + esc(prop) + "<br>" +
+            "Participating: " + esc(s.openToAll ? "All properties" : (uniqueParticipants.join(", ") || prop)) + "<br>" +
+            "Start: " + esc(fmtDate(s.start)) + "<br>" +
+            "End: " + esc(fmtDate(s.end)) + "<br>" +
+            "Trainer: " + esc(uniqueTrainers.join(", ") || "TBC") + "<br>" +
+            "Status: " + esc(statusLabel) + "<br>" +
+            "Planned participants: " + esc(s.attendeesPlanned || "—") +
+            (s.unresolvedConflict ? "<br>⚠ Pending T&D review" : "");
+          var barHtml = '<div class="bar '+statusCls+'" data-tt="'+label+'" data-idx="'+idx+'" style="left:'+left+'%;width:'+width+'%;background-color:var('+colorVar+')"></div>';
+          // The training name is printed beside the bar itself (not just in the
+          // hover tooltip) so the chart is readable without hovering -- a
+          // hosting venue on its own (e.g. "Moshi") doesn't say what's running.
+          // The inline left below is a reasonable starting guess (bar's own
+          // start plus its approximate rendered width) so the label is never
+          // badly placed even before layout runs; positionBarLabels then
+          // corrects it to the bar's *actual* rendered right edge in pixels.
+          var labelHtml = '<div class="bar-label" data-tt="'+label+'" data-idx="'+idx+'" style="left:calc('+left+'% + 18px)">'+esc(truncateLabel(trainingName, 46))+'</div>';
+          return barHtml + labelHtml;
+        }).join("");
+        return '<div class="track" style="'+trackGridStyle+'">'+bars+'</div>';
       }).join("");
       return '<div class="gantt-row"><div class="row-label">'+esc(prop)+'<span class="country">'+esc(p.country)+'</span></div>'+
-        '<div class="track" style="'+trackGridStyle+'">'+bars+'</div></div>';
+        '<div class="lanes">'+lanesHtml+'</div></div>';
     }).join("");
 
     wrap.innerHTML = monthsHtml + '<div class="gantt-body">' + rowsHtml + '</div>';
@@ -1220,6 +1316,31 @@
     // rather than relying on a single synchronous measurement.
     if(typeof requestAnimationFrame === "function"){
       requestAnimationFrame(function(){ requestAnimationFrame(function(){ positionBarLabels(wrap); }); });
+    }
+    if(document.fonts && document.fonts.ready && typeof document.fonts.ready.then === "function"){
+      document.fonts.ready.then(function(){ positionBarLabels(wrap); });
+    }
+    // Labels are placed at an absolute pixel offset computed from each bar's
+    // *rendered* position, but the bars themselves are laid out with
+    // percentage widths -- so anything that changes the chart's actual pixel
+    // width after that point (window resize, the browser sidebar/devtools
+    // opening or closing, a page zoom change, the container reflowing when a
+    // scrollbar appears or disappears) leaves the labels sitting at their old
+    // fixed-pixel spot while the bars have already moved, which is exactly
+    // what produces overlapping/garbled text. A ResizeObserver on the wrap
+    // element re-runs positionBarLabels every time its rendered size actually
+    // changes, for as long as the page stays open -- not just once at load --
+    // so labels can never drift out of sync with their bars. Set up once
+    // (renderGantt itself is called again on every filter change and on each
+    // live-data refresh, so this must not be re-attached every time).
+    if(typeof ResizeObserver === "function" && !wrap.__ganttResizeObserverAttached){
+      wrap.__ganttResizeObserverAttached = true;
+      var resizeRaf = null;
+      var ro = new ResizeObserver(function(){
+        if(resizeRaf) cancelAnimationFrame(resizeRaf);
+        resizeRaf = requestAnimationFrame(function(){ positionBarLabels(wrap); });
+      });
+      ro.observe(wrap);
     }
   }
 
@@ -1242,12 +1363,24 @@
         var bars = Array.prototype.slice.call(track.querySelectorAll(".bar"));
         if(!bars.length) return;
         bars.sort(function(a,b){ return a.offsetLeft - b.offsetLeft; });
+        var trackWidth = track.clientWidth;
         var pairs = bars.map(function(bar){
           var label = track.querySelector('.bar-label[data-idx="'+bar.getAttribute("data-idx")+'"]');
-          if(label){ label.style.left = (bar.offsetLeft + bar.offsetWidth + GAP) + "px"; }
+          if(label){
+            var leftPx = bar.offsetLeft + bar.offsetWidth + GAP;
+            // Stored as a percentage of the track's current width, not a
+            // fixed pixel value: the bar itself is positioned with CSS
+            // percentages, so a percentage-based label position automatically
+            // stays glued to the bar's right edge through any later reflow
+            // (window resize, page zoom, a device-pixel-ratio/DPI change,
+            // the container's own width changing) with no JS re-run needed --
+            // a cached pixel offset would silently drift out of sync in every
+            // one of those cases instead, which is what let labels visibly
+            // overlap their own bar's icon after the page had already loaded.
+            label.style.left = trackWidth > 0 ? ((leftPx / trackWidth * 100) + "%") : (leftPx + "px");
+          }
           return {bar:bar, label:label};
         });
-        var trackWidth = track.clientWidth;
         for(var i=0;i<pairs.length;i++){
           var label = pairs[i].label;
           if(!label) continue;
@@ -1295,8 +1428,22 @@
       return String(a.property || "").localeCompare(String(b.property || ""));
     });
     document.getElementById("tableNote").textContent = sorted.length + " logged " + (sorted.length===1?"session":"sessions");
+    var lastMonthKey = null, prevRow = null;
     document.getElementById("tableBody").innerHTML = sorted.map(function(r){
       var colorVar = CAT_COLOR[r.category] || FALLBACK_COLOR;
+      // Sessions are date-sorted, so a month subhead every time the month
+      // changes gives the long list the structure it was missing.
+      var monthKey = r.start ? (r.start.getUTCFullYear()+'-'+r.start.getUTCMonth()) : 'tbc';
+      var sepHtml = "";
+      if(monthKey !== lastMonthKey){
+        lastMonthKey = monthKey;
+        prevRow = null;
+        var monthLabel = r.start ? (MONTHS[r.start.getUTCMonth()] + ' ' + r.start.getUTCFullYear()) : 'Dates to be confirmed';
+        sepHtml = '<tr class="month-sep"><td colspan="10">'+esc(monthLabel)+'</td></tr>';
+      }
+      var sameDept = prevRow && prevRow.department && prevRow.department === r.department ? ' class="repeat-cell"' : '';
+      var sameCat = prevRow && prevRow.category && prevRow.category === r.category ? ' class="repeat-cell"' : '';
+      prevRow = r;
       var dateStr = r.start ?
         (fmtDate(r.start) + (r.end && r.end.getTime()!==r.start.getTime() ? (" – " + fmtDate(r.end)) : "")) :
         '<span class="muted-cell">Date TBC</span>';
@@ -1307,10 +1454,10 @@
       var tdBadge = r.unresolvedConflict ? ' <span class="td-badge pending">⚠ Pending T&amp;D Review</span>' : "";
       var action = sessionAction(r);
       var propTitle = r.participatingProperty ? ("Participating: " + r.participatingProperty) : "";
-      return '<tr'+(r.unresolvedConflict?' class="conflict-row" title="Possible double-booking: this department already has a session on an overlapping date at this property"':'')+'>'+
+      return sepHtml + '<tr'+(r.unresolvedConflict?' class="conflict-row" title="Possible double-booking: this department already has a session on an overlapping date at this property"':'')+'>'+
         '<td'+(propTitle?' title="'+esc(propTitle)+'"':'')+'>'+(r.unresolvedConflict?'<span aria-hidden="true">⚠️ </span>':'')+esc(r.property)+tdBadge+'</td>'+
-        '<td>'+(r.department ? esc(r.department) : '<span class="muted-cell">&mdash;</span>')+'</td>'+
-        '<td><span class="tag"><span class="cat-swatch" style="background:var('+colorVar+')"></span>'+esc(r.category)+'</span></td>'+
+        '<td'+sameDept+'>'+(r.department ? esc(r.department) : '<span class="muted-cell">&mdash;</span>')+'</td>'+
+        '<td'+sameCat+'><span class="tag"><span class="cat-swatch" style="background:var('+colorVar+')"></span>'+esc(r.category)+'</span></td>'+
         '<td>'+esc(r.area)+'</td>'+
         '<td>'+(r.start ? esc(dateStr) : dateStr)+'</td>'+
         '<td>'+(r.trainer ? esc(r.trainer) : '<span class="muted-cell">TBC</span>')+'</td>'+
