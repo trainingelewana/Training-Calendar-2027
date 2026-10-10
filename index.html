@@ -565,7 +565,7 @@
           <thead>
             <tr>
               <th>Hosting venue</th><th>Department</th><th>Category</th><th>Training name</th><th>Dates</th>
-              <th>Trainer</th><th class="num">Attendees</th><th>Status</th><th>Registration / Attendance</th><th>Report</th>
+              <th>Trainer</th><th class="num">Attendees</th><th>Status</th><th>Registration / Attendance</th><th>Training brief</th><th>Report</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
@@ -804,6 +804,21 @@
     return "";
   }
 
+  // Same idea for the "Training Brief" column (added to the sheet Oct 2026,
+  // just before "Training Report Links"): matched on the start of the header
+  // because the header cell also carries the "keep raw links" instruction.
+  function findBriefLink(r){
+    var keys = Object.keys(r);
+    for(var i=0;i<keys.length;i++){
+      if(/^training brief/i.test(keys[i])){
+        var val = String(r[keys[i]] || "").trim();
+        if(/^https?:\/\//i.test(val)) return val;
+        return "";
+      }
+    }
+    return "";
+  }
+
   function normalize(rows){
     // Note: rows without a parseable date are kept (shown as "Date TBC" in
     // KPIs and the session table) rather than dropped here — only the
@@ -840,6 +855,7 @@
         tdReview: r["T&D Date Review"] || "",
         // Column T: the final training report for that session, once T&D
         // has filed one -- a plain URL, not a Sheets link-chip.
+        briefLink: findBriefLink(r),
         reportLink: findReportLink(r)
       };
     }).map(function(row){
@@ -1459,7 +1475,7 @@
         lastMonthKey = monthKey;
         prevRow = null;
         var monthLabel = r.start ? (MONTHS[r.start.getUTCMonth()] + ' ' + r.start.getUTCFullYear()) : 'Dates to be confirmed';
-        sepHtml = '<tr class="month-sep"><td colspan="10">'+esc(monthLabel)+'</td></tr>';
+        sepHtml = '<tr class="month-sep"><td colspan="11">'+esc(monthLabel)+'</td></tr>';
       }
       var sameDept = prevRow && prevRow.department && prevRow.department === r.department ? ' class="repeat-cell"' : '';
       var sameCat = prevRow && prevRow.category && prevRow.category === r.category ? ' class="repeat-cell"' : '';
@@ -1484,6 +1500,7 @@
         '<td class="num">'+attendance+'</td>'+
         '<td><span class="status-pill '+esc(statusClass)+'">'+esc(r.status)+'</span></td>'+
         '<td>'+(action ? '<a class="btn btn-small" href="'+esc(action.href)+'" target="_blank" rel="noopener">'+esc(action.label)+' &#8599;</a>' : '<span class="muted-cell">&mdash;</span>')+'</td>'+
+        '<td>'+(r.briefLink ? '<a class="btn btn-small" href="'+esc(r.briefLink)+'" target="_blank" rel="noopener">View brief &#8599;</a>' : '<span class="muted-cell">&mdash;</span>')+'</td>'+
         '<td>'+(r.reportLink ? '<a class="btn btn-small" href="'+esc(r.reportLink)+'" target="_blank" rel="noopener">View report &#8599;</a>' : '<span class="muted-cell">&mdash;</span>')+'</td>'+
         '</tr>';
     }).join("");
