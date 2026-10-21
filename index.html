@@ -416,6 +416,7 @@
   footer a{ color:var(--text-secondary); }
 
   .empty{ padding:26px; text-align:center; color:var(--muted); font-size:13.5px; }
+  .gm-advanced-section,.gm-secondary-filter{display:none!important}
 </style>
 
 <div class="wrap">
@@ -440,7 +441,7 @@
   </header>
 
   <div class="action-bar">
-    <p>Find upcoming training, check your property&rsquo;s schedule and register your team.</p>
+    <p>Select your property to find relevant training, including sessions hosted at another property.</p>
     <div class="quick-actions">
       <a class="btn btn-small" href="#upcomingSection">View upcoming training</a>
       <a class="btn btn-small" href="#plannerSection">View full year</a>
@@ -453,18 +454,18 @@
       <select id="fCountry"><option value="">All countries</option></select>
     </div>
     <div class="filter-field">
-      <label for="fProperty">Hosting venue</label>
-      <select id="fProperty"><option value="">All venues</option></select>
+      <label for="fProperty">My property</label>
+      <select id="fProperty"><option value="">Choose your property</option></select>
     </div>
     <div class="filter-field">
       <label for="fDepartment">Department</label>
       <select id="fDepartment"><option value="">All departments</option></select>
     </div>
-    <div class="filter-field">
+    <div class="filter-field gm-secondary-filter">
       <label for="fCategory">Category</label>
       <select id="fCategory"><option value="">All categories</option></select>
     </div>
-    <div class="filter-field">
+    <div class="filter-field gm-secondary-filter">
       <label for="fStatus">Status</label>
       <select id="fStatus"><option value="">All statuses</option></select>
     </div>
@@ -519,16 +520,16 @@
     <div class="section-head">
       <div>
         <p class="eyebrow small">At a glance</p>
-        <h2>Programme Overview</h2>
+        <h2>Training at a Glance</h2>
       </div>
     </div>
     <div class="kpis" id="kpis"></div>
   </section>
 
-  <section>
+  <section class="gm-advanced-section">
     <div class="section-head">
       <div>
-        <p class="eyebrow small">Policy GEN PROP-004</p>
+        <p class="eyebrow small">Policy GEN PROP-004 — detailed analysis</p>
         <h2>Learning Mix &amp; Policy Alignment</h2>
       </div>
       <span class="section-note">6 approved categories</span>
@@ -574,7 +575,7 @@
     </div>
   </section>
 
-  <section>
+  <section class="gm-advanced-section">
     <details class="collapse-block" id="trainerDetails">
       <summary>
         <div>
@@ -868,7 +869,7 @@
   // ---------- filters ----------
   var FILTER_FIELDS = [
     {key:"country", id:"fCountry", allLabel:"All countries"},
-    {key:"property", id:"fProperty", allLabel:"All venues"},
+    {key:"property", id:"fProperty", allLabel:"Choose your property"},
     {key:"department", id:"fDepartment", allLabel:"All departments"},
     {key:"category", id:"fCategory", allLabel:"All categories"},
     {key:"area", id:"fArea", allLabel:"All training types"},
@@ -882,6 +883,15 @@
   // null) and to build cascading dropdown options (e.g. so the Property
   // list only shows properties left over after the Country filter, without
   // also hiding itself).
+  function propertyAppliesTo(r, selected){
+    if(!selected) return true;
+    var norm = function(v){ return String(canonicalProperty(v || "")).trim().toUpperCase(); };
+    var sel = norm(selected);
+    if(norm(r.property) === sel) return true;
+    var part = String(r.participatingProperty || "").trim();
+    if(/^(ALL PROPERTIES|ALL HODS)$/i.test(part)) return true;
+    return part.split(/[,;\/]+/).some(function(p){ return norm(p) === sel; });
+  }
   function matchesFilters(r, excludeKey){
     for(var i=0;i<FILTER_FIELDS.length;i++){
       var f = FILTER_FIELDS[i];
@@ -891,6 +901,8 @@
       if(f.key === "department"){
         if(val === "All Departments"){ if(r.department !== "All Departments") return false; }
         else { if(r.department !== val && r.department !== "All Departments") return false; }
+      } else if(f.key === "property"){
+        if(!propertyAppliesTo(r, val)) return false;
       } else if(r[f.key] !== val){
         return false;
       }
@@ -929,7 +941,7 @@
         });
         uniqueSorted(base, "category").forEach(function(c){ if(values.indexOf(c) === -1) values.push(c); });
       } else {
-        values = uniqueSorted(base, f.key);
+        values = f.key === "property" ? uniqueSorted(allRows.filter(function(r){ return r.property && !/^Online/i.test(r.property); }), "property") : uniqueSorted(base, f.key);
       }
       fillSelect(f.id, values, f.allLabel, f.key);
     });
@@ -1034,6 +1046,7 @@
       {label:"Scheduling reviews required", value: reviewsRequired.toLocaleString(),
         sub: reviewsRequired ? "Unresolved overlaps awaiting T&D review" : "None outstanding", warn: reviewsRequired > 0}
     ];
+    tiles = [tiles[0], tiles[2], tiles[4]];
     document.getElementById("kpis").innerHTML = tiles.map(function(t){
       return '<div class="kpi'+(t.warn?' kpi-warn':'')+'"><div class="stat-label">'+esc(t.label)+'</div>'+
         '<div class="stat-value">'+esc(t.value)+'</div>'+
@@ -1053,8 +1066,9 @@
   function renderUpcoming(rows){
     var list = document.getElementById("upcomingList");
     var note = document.getElementById("upcomingNote");
+    var today = new Date(); today.setUTCHours(0,0,0,0);
     var upcoming = rows.filter(function(r){
-      return r.start && String(r.status).toLowerCase() !== "cancelled";
+      return r.start && r.start >= today && !/^(cancelled|on hold)/i.test(String(r.status));
     }).slice().sort(function(a,b){ return a.start - b.start; }).slice(0, 8);
     var undated = rows.filter(function(r){ return !r.start && String(r.status).toLowerCase() !== "cancelled"; }).length;
     if(!upcoming.length){
