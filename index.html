@@ -473,12 +473,8 @@
       <label for="fStatus">Status</label>
       <select id="fStatus"><option value="">All statuses</option></select>
     </div>
-    <button class="btn" id="moreFiltersBtn" type="button" aria-expanded="false">More filters</button>
     <button class="btn" id="clearFiltersBtn" type="button">Clear filters</button>
     <span class="section-note" id="filterSummary"></span>
-    <div class="more-filters-row" id="moreFiltersRow">
-
-    </div>
   </div>
 
   <section id="upcomingSection">
@@ -964,13 +960,6 @@
     document.getElementById("clearFiltersBtn").addEventListener("click", function(){
       FILTER_FIELDS.forEach(function(f){ FILTERS[f.key] = ""; });
       render(lastAllRows, lastMeta);
-    });
-    var moreBtn = document.getElementById("moreFiltersBtn");
-    var moreRow = document.getElementById("moreFiltersRow");
-    moreBtn.addEventListener("click", function(){
-      var showing = moreRow.classList.toggle("show");
-      moreBtn.setAttribute("aria-expanded", showing ? "true" : "false");
-      moreBtn.textContent = showing ? "Fewer filters" : "More filters";
     });
   }
 
