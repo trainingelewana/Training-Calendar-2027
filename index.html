@@ -530,6 +530,7 @@
   .training-session-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:12px}
   @media(max-width:850px){.department-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media(max-width:640px){.department-tiles,.training-detail-list{grid-template-columns:1fr}}
+.hod-module-card summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none}.hod-module-card summary::-webkit-details-marker{display:none}.hod-module-card summary strong{margin:0 0 5px}.hod-module-sessions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:15px;padding-top:12px;border-top:1px solid var(--border)}.hod-module-sessions .training-session-card{box-shadow:none}
 </style>
 
 <div class="wrap">
@@ -1237,9 +1238,34 @@
       '<div class="training-session-bottom"><span class="status-pill '+esc(String(r.status||"").toLowerCase())+'">'+esc(r.status||"Not specified")+'</span>'+
       (action ? '<a class="btn btn-small" href="'+esc(action.href)+'" target="_blank" rel="noopener">'+esc(action.label)+' ↗</a>' : '')+'</div></article>';
   }
+  function hodModuleGroup(r){
+    var text=String(r.area||"")+" "+String(r.department||"");
+    if(!/\\bHOD\\b|heads? of departments?|supervisory module|leadership.*management/i.test(text)) return "";
+    var match=String(r.area||"").match(/\\bmodule\\s*0?([1-8])\\b/i);
+    if(!match) return "";
+    var month=r.start ? r.start.getFullYear()+"-"+String(r.start.getMonth()+1).padStart(2,"0") : "undated";
+    return match[1]+"|"+month;
+  }
+  function groupedTrainingCards(rows){
+    var sorted=rows.slice().sort(function(a,b){return (a.start||new Date(8640000000000000))-(b.start||new Date(8640000000000000));});
+    var groups={}, items=[];
+    sorted.forEach(function(r){
+      var key=hodModuleGroup(r);
+      if(!key){items.push({rows:[r]});return;}
+      if(!groups[key]){groups[key]={rows:[],key:key};items.push(groups[key]);}
+      groups[key].rows.push(r);
+    });
+    return items.map(function(item){
+      if(!item.key)return trainingSessionCard(item.rows[0]);
+      var r=item.rows[0],moduleNum=item.key.split("|")[0];
+      var month=r.start ? r.start.toLocaleDateString("en-GB",{month:"long",year:"numeric"}) : "Dates to be confirmed";
+      return '<details class="training-session-card hod-module-card"><summary><span><strong>HOD Module '+esc(moduleNum)+'</strong><span class="session-meta">'+esc(month)+' · '+item.rows.length+' session'+(item.rows.length===1?'':'s')+'</span></span><span class="department-tile-open">View sessions ▾</span></summary>'+
+        '<div class="hod-module-sessions">'+item.rows.map(trainingSessionCard).join("")+'</div></details>';
+    }).join("");
+  }
   function renderTrainingGroup(el, rows, title){
     el.innerHTML='<div class="training-detail-head"><h3>'+esc(title)+'</h3><span class="section-note">'+rows.length+' session'+(rows.length===1?'':'s')+'</span></div>'+
-      (rows.length?'<div class="training-detail-list">'+rows.slice().sort(function(a,b){return (a.start||new Date(8640000000000000))-(b.start||new Date(8640000000000000));}).map(trainingSessionCard).join('')+'</div>':'<p>No matching training sessions for the selected property and month.</p>');
+      (rows.length?'<div class="training-detail-list">'+groupedTrainingCards(rows)+'</div>':'<p>No matching training sessions for the selected property and month.</p>');
   }
   function renderTrainingTiles(rows){
     var departments={};
