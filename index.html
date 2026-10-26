@@ -937,7 +937,13 @@
       };
       var selectedCountry = propertyCountries[sel];
       var sessionCountry = String(r.country || "").trim().toLowerCase();
-      return !!selectedCountry && sessionCountry === selectedCountry.toLowerCase();
+      if(!selectedCountry) return false;
+      // Country labels may be single-country or combined (KE & TZ / KE, TZ & RW).
+      var includedCountries = sessionCountry.split(/[^a-z]+/).filter(Boolean);
+      var countryNames = {Tanzania:["tanzania","tz"], Kenya:["kenya","ke"], Rwanda:["rwanda","rw"]};
+      return (countryNames[selectedCountry] || []).some(function(name){
+        return includedCountries.indexOf(name) !== -1;
+      });
     }
     return part.split(/[,;\/]+/).some(function(p){ return norm(p) === sel; });
   }
