@@ -477,6 +477,18 @@
 .weekly-online-time{font-weight:700;color:var(--accent-text);white-space:nowrap}
 @media(max-width:880px){.weekly-online-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:510px){.weekly-online-item{grid-template-columns:80px 74px minmax(0,1fr);gap:5px;padding:9px 7px;font-size:11px}}
+
+.weekly-sop-section{margin:14px 0 20px}
+.weekly-sop-tile{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:12px;overflow:hidden}
+.weekly-sop-tile>summary{display:flex;justify-content:space-between;align-items:center;gap:15px;cursor:pointer;padding:15px 18px;color:var(--text-primary)}
+.weekly-sop-tile>summary strong{display:block;font-size:17px}
+.weekly-sop-tile>summary small{display:block;font-size:12px;color:var(--text-secondary);margin-top:4px}
+.weekly-sop-toggle{font-size:12px;color:var(--accent-text);white-space:nowrap}
+.weekly-sop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;padding:0 15px 15px}
+.weekly-sop-item{display:flex;flex-direction:column;gap:4px;background:var(--surface-2);border:1px solid var(--grid);border-radius:8px;padding:12px;min-width:0;font-size:13px}
+.weekly-sop-day{color:var(--text-secondary);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.weekly-sop-item strong{color:var(--accent-text);font-size:15px}
+@media(max-width:600px){.weekly-sop-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.weekly-sop-item{padding:9px}.weekly-sop-tile>summary{padding:12px}}
 </style>
 
 <div class="wrap">
@@ -553,6 +565,21 @@
         <div class="weekly-online-item"><strong>Friday</strong><span class="weekly-online-time">11:00 AM</span><span>Accounts &amp; Stores</span></div>
       </div>
     </div>
+  </section>
+
+  <section id="weeklyOnlineSopSection" class="weekly-sop-section">
+    <details class="weekly-sop-tile" open>
+      <summary><span><strong>Weekly Online SOP Training</strong><small>Recurring weekly sessions · All times East Africa Time (EAT)</small></span><span class="weekly-sop-toggle">View timetable</span></summary>
+      <div class="weekly-sop-grid">
+        <div class="weekly-sop-item"><span class="weekly-sop-day">Monday</span><strong>11:00 AM</strong><span>Food &amp; Beverage SOPs</span></div>
+        <div class="weekly-sop-item"><span class="weekly-sop-day">Tuesday</span><strong>11:00 AM</strong><span>Housekeeping SOPs</span></div>
+        <div class="weekly-sop-item"><span class="weekly-sop-day">Wednesday</span><strong>10:00 AM</strong><span>Spa SOPs</span></div>
+        <div class="weekly-sop-item"><span class="weekly-sop-day">Wednesday</span><strong>11:00 AM</strong><span>Front Office SOPs</span></div>
+        <div class="weekly-sop-item"><span class="weekly-sop-day">Thursday</span><strong>11:00 AM</strong><span>Garden, Security &amp; Maintenance SOPs</span></div>
+        <div class="weekly-sop-item"><span class="weekly-sop-day">Thursday</span><strong>2:00 PM</strong><span>Spa SOPs</span></div>
+        <div class="weekly-sop-item"><span class="weekly-sop-day">Friday</span><strong>11:00 AM</strong><span>Accounts &amp; Stores SOPs</span></div>
+      </div>
+    </details>
   </section>
 
   <section id="upcomingSection">
