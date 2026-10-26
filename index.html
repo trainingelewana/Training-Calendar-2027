@@ -468,6 +468,15 @@
 #filtersBar>.filter-field{flex:1 1 220px;max-width:380px}
 #filtersBar .calendar-more-grid .filter-field{min-width:180px}
 @media(min-width:760px){#upcomingList.upcoming-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+.weekly-online-section{margin:14px 0 20px}
+.weekly-online-card{padding:13px 16px}
+.weekly-online-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px}
+.weekly-online-item{display:grid;grid-template-columns:100px 85px minmax(0,1fr);align-items:center;gap:10px;border:1px solid var(--border);border-radius:8px;padding:11px 12px;min-width:0;font-size:13px}
+.weekly-online-item strong{font-size:13px}
+.weekly-online-time{font-weight:700;color:var(--accent-text);white-space:nowrap}
+@media(max-width:880px){.weekly-online-grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:510px){.weekly-online-item{grid-template-columns:80px 74px minmax(0,1fr);gap:5px;padding:9px 7px;font-size:11px}}
 </style>
 
 <div class="wrap">
@@ -530,6 +539,21 @@
     <button class="btn" id="clearFiltersBtn" type="button">Clear filters</button>
     <span class="section-note" id="filterSummary"></span>
   </div>
+
+  <section id="weeklyOnlineSection" class="weekly-online-section">
+    <div class="section-head"><div><p class="eyebrow small">Recurring live sessions</p><h2>Weekly Online Training</h2></div><span class="section-note">Times shown in East Africa Time (EAT)</span></div>
+    <div class="card weekly-online-card">
+      <div class="weekly-online-grid">
+        <div class="weekly-online-item"><strong>Monday</strong><span class="weekly-online-time">11:00 AM</span><span>Food &amp; Beverage SOPs</span></div>
+        <div class="weekly-online-item"><strong>Tuesday</strong><span class="weekly-online-time">11:00 AM</span><span>Housekeeping SOPs</span></div>
+        <div class="weekly-online-item"><strong>Wednesday</strong><span class="weekly-online-time">10:00 AM</span><span>Spa Only</span></div>
+        <div class="weekly-online-item"><strong>Wednesday</strong><span class="weekly-online-time">11:00 AM</span><span>Front Office</span></div>
+        <div class="weekly-online-item"><strong>Thursday</strong><span class="weekly-online-time">11:00 AM</span><span>Garden, Security &amp; Maintenance</span></div>
+        <div class="weekly-online-item"><strong>Thursday</strong><span class="weekly-online-time">2:00 PM</span><span>Spa Only</span></div>
+        <div class="weekly-online-item"><strong>Friday</strong><span class="weekly-online-time">11:00 AM</span><span>Accounts &amp; Stores</span></div>
+      </div>
+    </div>
+  </section>
 
   <section id="upcomingSection">
     <div class="section-head">
