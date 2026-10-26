@@ -510,6 +510,26 @@
 .annual-plan-tile span:first-child{display:flex;flex-direction:column;gap:4px}
 .annual-plan-tile small{font-size:12px;color:var(--text-secondary);font-weight:400}
 @media(max-width:759px){#upcomingList.upcoming-list,.weekly-sop-grid{grid-template-columns:1fr!important}}
+
+  /* Departmental drill-down: show one entry-point per department rather than a second event list. */
+  .department-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .department-tile{display:flex;flex-direction:column;text-align:left;gap:8px;width:100%;border:1px solid var(--border);border-radius:10px;padding:20px;background:var(--surface);color:var(--text-primary);cursor:pointer;box-shadow:var(--shadow-soft);font:inherit;min-height:124px}
+  .department-tile:hover,.department-tile:focus-visible,.department-tile[aria-expanded="true"]{border-color:var(--accent);box-shadow:var(--shadow)}
+  .department-tile-title{font-weight:700;font-size:1.05rem}
+  .department-tile-count{color:var(--text-secondary);font-size:.87rem}
+  .department-tile-open{color:var(--accent-text);font-size:.84rem;margin-top:auto}
+  .osha-tile{max-width:100%;min-height:105px}
+  .training-detail-area{margin-top:15px;padding:18px;border:1px solid var(--border);background:var(--surface);border-radius:10px}
+  .training-detail-area[hidden]{display:none}
+  .training-detail-head{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:12px}
+  .training-detail-head h3{margin:0;font-size:1.1rem}
+  .training-detail-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .training-session-card{padding:16px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+  .training-session-card strong{display:block;margin:6px 0}
+  .training-session-card .session-meta{font-size:.84rem;color:var(--text-secondary);line-height:1.6}
+  .training-session-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:12px}
+  @media(max-width:850px){.department-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:640px){.department-tiles,.training-detail-list{grid-template-columns:1fr}}
 </style>
 
 <div class="wrap">
@@ -573,36 +593,6 @@
     <span class="section-note" id="filterSummary"></span>
   </div>
 
-  <section id="weeklyOnlineSection" class="weekly-online-section">
-    <div class="section-head"><div><p class="eyebrow small">Recurring live sessions</p><h2>Weekly Online Training</h2></div><span class="section-note">Times shown in East Africa Time (EAT)</span></div>
-    <div class="card weekly-online-card">
-      <div class="weekly-online-grid">
-        <div class="weekly-online-item"><strong>Monday</strong><span class="weekly-online-time">11:00 AM</span><span>Food &amp; Beverage SOPs</span></div>
-        <div class="weekly-online-item"><strong>Tuesday</strong><span class="weekly-online-time">11:00 AM</span><span>Housekeeping SOPs</span></div>
-        <div class="weekly-online-item"><strong>Wednesday</strong><span class="weekly-online-time">10:00 AM</span><span>Spa Only</span></div>
-        <div class="weekly-online-item"><strong>Wednesday</strong><span class="weekly-online-time">11:00 AM</span><span>Front Office</span></div>
-        <div class="weekly-online-item"><strong>Thursday</strong><span class="weekly-online-time">11:00 AM</span><span>Garden, Security &amp; Maintenance</span></div>
-        <div class="weekly-online-item"><strong>Thursday</strong><span class="weekly-online-time">2:00 PM</span><span>Spa Only</span></div>
-        <div class="weekly-online-item"><strong>Friday</strong><span class="weekly-online-time">11:00 AM</span><span>Accounts &amp; Stores</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="weeklyOnlineSopSection" class="weekly-sop-section">
-    <details class="weekly-sop-tile" open>
-      <summary><span><strong>Weekly Online SOP Training</strong><small>Recurring weekly sessions · All times East Africa Time (EAT)</small></span><span class="weekly-sop-toggle">View timetable</span></summary>
-      <div class="weekly-sop-grid">
-        <div class="weekly-sop-item"><span class="weekly-sop-day">Monday</span><strong>11:00 AM</strong><span>Food &amp; Beverage SOPs</span></div>
-        <div class="weekly-sop-item"><span class="weekly-sop-day">Tuesday</span><strong>11:00 AM</strong><span>Housekeeping SOPs</span></div>
-        <div class="weekly-sop-item"><span class="weekly-sop-day">Wednesday</span><strong>10:00 AM</strong><span>Spa SOPs</span></div>
-        <div class="weekly-sop-item"><span class="weekly-sop-day">Wednesday</span><strong>11:00 AM</strong><span>Front Office SOPs</span></div>
-        <div class="weekly-sop-item"><span class="weekly-sop-day">Thursday</span><strong>11:00 AM</strong><span>Garden, Security &amp; Maintenance SOPs</span></div>
-        <div class="weekly-sop-item"><span class="weekly-sop-day">Thursday</span><strong>2:00 PM</strong><span>Spa SOPs</span></div>
-        <div class="weekly-sop-item"><span class="weekly-sop-day">Friday</span><strong>11:00 AM</strong><span>Accounts &amp; Stores SOPs</span></div>
-      </div>
-    </details>
-  </section>
-
   <section id="weeklySopSection" class="calendar-tile-section">
     <div class="section-head"><div><p class="eyebrow small">Recurring online sessions</p><h2>Weekly Online SOP Training</h2></div></div>
     <div class="weekly-sop-grid">
@@ -617,17 +607,16 @@
     <p class="legend-note">Recurring weekly SOP timetable · Times shown in East Africa Time (EAT)</p>
   </section>
 
-  <section id="upcomingSection">
-    <div class="section-head">
-      <div>
-        <p class="eyebrow small">What's next</p>
-        <h2>Upcoming Training</h2>
-      </div>
-      <span class="section-note" id="upcomingNote"></span>
-    </div>
-    <div class="card" style="padding:6px 18px;">
-      <div class="upcoming-list" id="upcomingList"></div>
-    </div>
+  <section id="departmentTrainingSection">
+    <div class="section-head"><div><p class="eyebrow small">Browse by department</p><h2>Department Training</h2></div><span class="section-note" id="departmentTrainingNote"></span></div>
+    <div class="department-tiles" id="departmentTiles"></div>
+    <div id="departmentTrainingDetails" class="training-detail-area" hidden></div>
+  </section>
+
+  <section id="oshaTrainingSection">
+    <div class="section-head"><div><p class="eyebrow small">Safety &amp; compliance</p><h2>OSHA Training</h2></div></div>
+    <button type="button" id="oshaTrainingTile" class="department-tile osha-tile" aria-expanded="false" aria-controls="oshaTrainingDetails"><span class="department-tile-title">OSHA Training</span><span class="department-tile-count" id="oshaCount"></span><span class="department-tile-open">View OSHA sessions ▾</span></button>
+    <div id="oshaTrainingDetails" class="training-detail-area" hidden></div>
   </section>
 
   <details class="calendar-expand" id="ganttDisclosure"><summary class="annual-plan-tile"><span><strong>Annual Training Plan</strong><small>View the full 2027 Gantt chart</small></span><span aria-hidden="true">▦</span></summary>
@@ -1141,7 +1130,7 @@
     renderStatus(meta);
     populateFilters(rows);
     var filtered = applyFilters(rows);
-    renderUpcoming(filtered);
+    renderTrainingTiles(filtered);
     renderKpis(filtered);
     renderCategories(filtered);
     renderCategoryDonut(filtered);
@@ -1221,6 +1210,65 @@
   // Compact, date-sorted quick-action list for GMs -- the next handful of
   // sessions that haven't happened yet, each with a direct register/attend
   // action so a GM never has to open the full table below.
+
+  // Department tiles use the same filtered live rows as the rest of the calendar.
+  // OSHA is separated by training area/category, without altering source records.
+  var OPEN_TRAINING_GROUP = "";
+  function isOshaTraining(r){
+    return /\\bOSHA\\b|occupational safety and health/i.test(String(r.area||"")+" "+String(r.category||""));
+  }
+  function trainingSessionCard(r){
+    var dateText = r.start ? fmtDate(r.start)+(r.end && r.end.getTime()!==r.start.getTime() ? " – "+fmtDate(r.end) : "") : "Date to be confirmed";
+    var action = sessionAction(r);
+    return '<article class="training-session-card"><div class="session-meta">'+esc(dateText)+'</div><strong>'+esc(r.area||r.category||"Training session")+'</strong>'+
+      '<div class="session-meta">'+esc(r.property||"")+" · "+esc(r.department||"")+
+      (r.participatingProperty ? " · Participants: "+esc(r.participatingProperty) : "")+'</div>'+
+      '<div class="training-session-bottom"><span class="status-pill '+esc(String(r.status||"").toLowerCase())+'">'+esc(r.status||"Not specified")+'</span>'+
+      (action ? '<a class="btn btn-small" href="'+esc(action.href)+'" target="_blank" rel="noopener">'+esc(action.label)+' ↗</a>' : '')+'</div></article>';
+  }
+  function renderTrainingGroup(el, rows, title){
+    el.innerHTML='<div class="training-detail-head"><h3>'+esc(title)+'</h3><span class="section-note">'+rows.length+' session'+(rows.length===1?'':'s')+'</span></div>'+
+      (rows.length?'<div class="training-detail-list">'+rows.slice().sort(function(a,b){return (a.start||new Date(8640000000000000))-(b.start||new Date(8640000000000000));}).map(trainingSessionCard).join('')+'</div>':'<p>No matching training sessions for the selected property and month.</p>');
+  }
+  function renderTrainingTiles(rows){
+    var departments={};
+    rows.filter(function(r){return !isOshaTraining(r);}).forEach(function(r){
+      var dept=String(r.department||"").trim()||"Other Training";
+      if(!departments[dept])departments[dept]=[];
+      departments[dept].push(r);
+    });
+    var names=Object.keys(departments).sort(function(a,b){return a.localeCompare(b);});
+    var tileList=document.getElementById("departmentTiles");
+    tileList.innerHTML=names.length?names.map(function(name,i){
+      return '<button type="button" class="department-tile" data-training-group="'+i+'" aria-expanded="'+(OPEN_TRAINING_GROUP===name)+'" aria-controls="departmentTrainingDetails">'+
+        '<span class="department-tile-title">'+esc(name)+'</span><span class="department-tile-count">'+departments[name].length+' training session'+(departments[name].length===1?'':'s')+'</span>'+
+        '<span class="department-tile-open">'+(OPEN_TRAINING_GROUP===name?'Hide training ▴':'View all training ▾')+'</span></button>';
+    }).join(''):'<p>No departmental training matches the selected filters.</p>';
+    document.getElementById("departmentTrainingNote").textContent=names.length+' departments';
+    var details=document.getElementById("departmentTrainingDetails");
+    if(departments[OPEN_TRAINING_GROUP]){
+      details.hidden=false;renderTrainingGroup(details,departments[OPEN_TRAINING_GROUP],OPEN_TRAINING_GROUP);
+    }else{details.hidden=true;details.innerHTML="";}
+    Array.prototype.forEach.call(tileList.querySelectorAll("[data-training-group]"),function(btn){
+      btn.addEventListener("click",function(){
+        var name=names[Number(btn.getAttribute("data-training-group"))];
+        OPEN_TRAINING_GROUP=OPEN_TRAINING_GROUP===name?"":name;
+        renderTrainingTiles(rows);
+      });
+    });
+    var osha=rows.filter(isOshaTraining);
+    document.getElementById("oshaCount").textContent=osha.length+' training session'+(osha.length===1?'':'s');
+    var oshaDetails=document.getElementById("oshaTrainingDetails");
+    var open=OPEN_TRAINING_GROUP==="__OSHA__";
+    document.getElementById("oshaTrainingTile").setAttribute("aria-expanded",String(open));
+    oshaDetails.hidden=!open;
+    if(open)renderTrainingGroup(oshaDetails,osha,"OSHA Training");
+    else oshaDetails.innerHTML="";
+  }
+  document.getElementById("oshaTrainingTile").addEventListener("click",function(){
+    OPEN_TRAINING_GROUP=OPEN_TRAINING_GROUP==="__OSHA__"?"":"__OSHA__";
+    renderTrainingTiles(applyFilters(lastAllRows));
+  });
   function renderUpcoming(rows){
     var list = document.getElementById("upcomingList");
     var note = document.getElementById("upcomingNote");
