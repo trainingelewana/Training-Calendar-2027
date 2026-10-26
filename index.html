@@ -1219,15 +1219,19 @@
     return /\\bOSHA\\b|occupational safety and health/i.test(String(r.area||"")+" "+String(r.category||""));
   }
   function isOnlineSopTraining(r){
-    // Weekly online SOP training belongs only in the dedicated recurring timetable.
-    // Keep in-person / property-based SOP courses in departmental training.
+    // Online SOPs are shown only in the dedicated weekly timetable.
+    // Classify using the full session record, not only the visible course title.
     var title=String(r.area||"");
     var category=String(r.category||"");
-    var host=String(r.property||"");
+    var department=String(r.department||"");
+    var location=String(r.property||"");
+    var country=String(r.country||"");
+    var facilitator=String(r.trainer||"");
     var notes=String(r.notes||"");
-    var sop=/\\bSOPs?\\b|standard operating procedure/i.test(title+" "+category);
-    var online=/online|virtual|webinar|teams|zoom|google meet/i.test(host+" "+title+" "+notes);
-    return sop && online;
+    var details=[title,category,department,location,country,facilitator,notes].join(" ");
+    var isSop=/\bSOPs?\b|standard operating procedures?/i.test(details);
+    var online=/\bonline\b|\bvirtual\b|\bwebinar\b|\bremote\b|\bteams\b|\bzoom\b|google meet|\bmeetings?\s+online\b/i.test(details);
+    return isSop && online;
   }
   function trainingSessionCard(r){
     var dateText = r.start ? fmtDate(r.start)+(r.end && r.end.getTime()!==r.start.getTime() ? " – "+fmtDate(r.end) : "") : "Date to be confirmed";
