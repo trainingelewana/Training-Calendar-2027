@@ -1217,6 +1217,17 @@
   function isOshaTraining(r){
     return /\\bOSHA\\b|occupational safety and health/i.test(String(r.area||"")+" "+String(r.category||""));
   }
+  function isOnlineSopTraining(r){
+    // Weekly online SOP training belongs only in the dedicated recurring timetable.
+    // Keep in-person / property-based SOP courses in departmental training.
+    var title=String(r.area||"");
+    var category=String(r.category||"");
+    var host=String(r.property||"");
+    var notes=String(r.notes||"");
+    var sop=/\\bSOPs?\\b|standard operating procedure/i.test(title+" "+category);
+    var online=/online|virtual|webinar|teams|zoom|google meet/i.test(host+" "+title+" "+notes);
+    return sop && online;
+  }
   function trainingSessionCard(r){
     var dateText = r.start ? fmtDate(r.start)+(r.end && r.end.getTime()!==r.start.getTime() ? " – "+fmtDate(r.end) : "") : "Date to be confirmed";
     var action = sessionAction(r);
@@ -1232,7 +1243,7 @@
   }
   function renderTrainingTiles(rows){
     var departments={};
-    rows.filter(function(r){return !isOshaTraining(r);}).forEach(function(r){
+    rows.filter(function(r){return !isOshaTraining(r) && !isOnlineSopTraining(r);}).forEach(function(r){
       var dept=String(r.department||"").trim()||"Other Training";
       if(!departments[dept])departments[dept]=[];
       departments[dept].push(r);
