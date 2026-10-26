@@ -531,6 +531,7 @@
   @media(max-width:850px){.department-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media(max-width:640px){.department-tiles,.training-detail-list{grid-template-columns:1fr}}
 .hod-module-card summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none}.hod-module-card summary::-webkit-details-marker{display:none}.hod-module-card summary strong{margin:0 0 5px}.hod-module-sessions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:15px;padding-top:12px;border-top:1px solid var(--border)}.hod-module-sessions .training-session-card{box-shadow:none}
+.calendar-panel-disclosure{margin:18px 0;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:0 18px 12px}.calendar-panel-disclosure>summary{cursor:pointer;display:list-item;padding:18px 6px;font-weight:700;font-size:1.08rem;color:var(--text-primary)}.calendar-panel-disclosure>section{margin:0;padding:0}.calendar-panel-disclosure>section>.section-head{display:none}.calendar-panel-disclosure:not([open]){padding-bottom:0}.calendar-panel-disclosure>summary:hover{color:var(--accent-text)}
 </style>
 
 <div class="wrap">
@@ -557,7 +558,7 @@
   <div class="action-bar">
     <p>Select your property to find relevant training, including sessions hosted at another property.</p>
     <div class="quick-actions">
-      <a class="btn btn-small" href="#upcomingSection">View upcoming training</a>
+      <a class="btn btn-small" href="#departmentTrainingSection">View upcoming training</a>
       <a class="btn btn-small" href="#plannerSection">View full year</a>
     </div>
   </div>
@@ -594,7 +595,7 @@
     <span class="section-note" id="filterSummary"></span>
   </div>
 
-  <section id="weeklySopSection" class="calendar-tile-section">
+  <details class="calendar-panel-disclosure" open id="weeklySopSectionDisclosure"><summary>Weekly Online SOP Training</summary><section id="weeklySopSection" class="calendar-tile-section">
     <div class="section-head"><div><p class="eyebrow small">Recurring online sessions</p><h2>Weekly Online SOP Training</h2></div></div>
     <div class="weekly-sop-grid">
       <div class="sop-tile"><span class="sop-day">Monday · 11:00 AM</span><strong>Food &amp; Beverage SOPs</strong></div>
@@ -606,19 +607,19 @@
       <div class="sop-tile"><span class="sop-day">Friday · 11:00 AM</span><strong>Accounts &amp; Stores SOPs</strong></div>
     </div>
     <p class="legend-note">Recurring weekly SOP timetable · Times shown in East Africa Time (EAT)</p>
-  </section>
+  </section></details>
 
-  <section id="departmentTrainingSection">
+  <details class="calendar-panel-disclosure" open id="departmentTrainingSectionDisclosure"><summary>Department Training</summary><section id="departmentTrainingSection">
     <div class="section-head"><div><p class="eyebrow small">Browse by department</p><h2>Department Training</h2></div><span class="section-note" id="departmentTrainingNote"></span></div>
     <div class="department-tiles" id="departmentTiles"></div>
     <div id="departmentTrainingDetails" class="training-detail-area" hidden></div>
-  </section>
+  </section></details>
 
-  <section id="oshaTrainingSection">
+  <details class="calendar-panel-disclosure" id="oshaTrainingSectionDisclosure"><summary>Compliance Training</summary><section id="oshaTrainingSection">
     <div class="section-head"><div><p class="eyebrow small">Safety &amp; compliance</p><h2>Compliance Training</h2></div></div>
     <button type="button" id="oshaTrainingTile" class="department-tile osha-tile" aria-expanded="false" aria-controls="oshaTrainingDetails"><span class="department-tile-title">Compliance Training</span><span class="department-tile-count" id="oshaCount"></span><span class="department-tile-open">View compliance sessions ▾</span></button>
     <div id="oshaTrainingDetails" class="training-detail-area" hidden></div>
-  </section>
+  </section></details>
 
   <details class="calendar-expand" id="ganttDisclosure"><summary class="annual-plan-tile"><span><strong>Annual Training Plan</strong><small>View the full 2027 Gantt chart</small></span><span aria-hidden="true">▦</span></summary>
   <section class="planner-section" id="plannerSection">
@@ -1216,7 +1217,9 @@
   // OSHA is separated by training area/category, without altering source records.
   var OPEN_TRAINING_GROUP = "";
   function isOshaTraining(r){
-    return /\\bOSHA\\b|occupational safety and health/i.test(String(r.area||"")+" "+String(r.category||""));
+    // Compliance includes statutory training, First Aid and all fire-safety disciplines.
+    var fields=[r.area,r.category,r.department].map(function(v){return String(v||"");}).join(" ");
+    return /\bOSHA\b|occupational safety and health|\bcompliance\b|\bmandatory\b|\bstatutory\b|\bregulatory\b|first[\s-]*aid|fire[\s-]*(fighting|fighter|marshal|safety|prevention|response)|firefighting|firemarshal/i.test(fields);
   }
   function isOnlineSopTraining(r){
     // The 2027 live log uses SOP27-xx-xx IDs and "Online – Group SOP Revision".
