@@ -914,7 +914,7 @@
     var sel = norm(selected);
     if(norm(r.property) === sel) return true;
     var part = String(r.participatingProperty || "").trim();
-    if(/^(ALL PROPERTIES|ALL HODS)$/i.test(part)) return true;
+    if(/^(ALL|ALL PROPERTIES|ALL HODS|ALL CAMPS|ALL LODGES)$/i.test(part)) return true;
     return part.split(/[,;\/]+/).some(function(p){ return norm(p) === sel; });
   }
   function matchesFilters(r, excludeKey){
