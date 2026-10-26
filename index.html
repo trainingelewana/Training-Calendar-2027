@@ -457,6 +457,17 @@
   #upcomingList .upcoming-row .u-action{grid-column:4;grid-row:1;justify-self:end;white-space:nowrap;}
   #upcomingList .upcoming-row .u-action .btn{width:auto;}
 }
+
+/* First-time user simplification without removing underlying reporting features. */
+.calendar-more-filters{flex:1 1 100%;border-top:1px solid var(--border);padding-top:6px}
+.calendar-more-filters>summary,.calendar-expand>summary{cursor:pointer;font-weight:700;color:var(--accent-text);padding:12px 14px;list-style:revert}
+.calendar-more-grid{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0 12px}
+.calendar-expand{border:1px solid var(--border);background:var(--surface);border-radius:12px;margin:15px 0}
+.calendar-expand>summary{font-size:16px}
+.calendar-expand>section{margin:0 12px 15px}
+#filtersBar>.filter-field{flex:1 1 220px;max-width:380px}
+#filtersBar .calendar-more-grid .filter-field{min-width:180px}
+@media(min-width:760px){#upcomingList.upcoming-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 </style>
 
 <div class="wrap">
@@ -490,12 +501,14 @@
 
   <div class="filters-bar" id="filtersBar">
     <div class="filter-field">
-      <label for="fCountry">Country</label>
-      <select id="fCountry"><option value="">All countries</option></select>
-    </div>
-    <div class="filter-field">
       <label for="fProperty">My property</label>
       <select id="fProperty"><option value="">Choose your property</option></select>
+    </div>
+    <div class="filter-field"><label for="fMonth">Month</label><select id="fMonth"><option value="">All months</option><option value="0">January</option><option value="1">February</option><option value="2">March</option><option value="3">April</option><option value="4">May</option><option value="5">June</option><option value="6">July</option><option value="7">August</option><option value="8">September</option><option value="9">October</option><option value="10">November</option><option value="11">December</option></select></div>
+    <details class="calendar-more-filters"><summary>More filters</summary><div class="calendar-more-grid">
+    <div class="filter-field">
+      <label for="fCountry">Country</label>
+      <select id="fCountry"><option value="">All countries</option></select>
     </div>
     <div class="filter-field">
       <label for="fDepartment">Department</label>
@@ -513,6 +526,7 @@
       <label for="fStatus">Status</label>
       <select id="fStatus"><option value="">All statuses</option></select>
     </div>
+    </div></details>
     <button class="btn" id="clearFiltersBtn" type="button">Clear filters</button>
     <span class="section-note" id="filterSummary"></span>
   </div>
@@ -530,6 +544,7 @@
     </div>
   </section>
 
+  <details class="calendar-expand" id="ganttDisclosure"><summary>View full-year Gantt chart</summary>
   <section class="planner-section" id="plannerSection">
     <div class="section-head">
       <div>
@@ -552,6 +567,8 @@
       </div>
     </div>
   </section>
+
+  </details>
 
   <section>
     <div class="section-head">
@@ -589,6 +606,7 @@
     </div>
   </section>
 
+  <details class="calendar-expand"><summary>View all session details</summary>
   <section>
     <div class="section-head">
       <div>
@@ -611,6 +629,8 @@
       </div>
     </div>
   </section>
+
+  </details>
 
   <section class="gm-advanced-section">
     <details class="collapse-block" id="trainerDetails">
@@ -947,7 +967,9 @@
     }
     return part.split(/[,;\/]+/).some(function(p){ return norm(p) === sel; });
   }
+  var SELECTED_MONTH = "";
   function matchesFilters(r, excludeKey){
+    if(SELECTED_MONTH!=="" && (!r.start || r.start.getMonth()!==Number(SELECTED_MONTH))) return false;
     for(var i=0;i<FILTER_FIELDS.length;i++){
       var f = FILTER_FIELDS[i];
       if(f.key === excludeKey) continue;
@@ -1009,6 +1031,7 @@
   }
 
   function setupFilters(){
+    document.getElementById("fMonth").addEventListener("change",function(e){SELECTED_MONTH=e.target.value;render(lastAllRows,lastMeta);});
     FILTER_FIELDS.forEach(function(f){
       document.getElementById(f.id).addEventListener("change", function(e){
         FILTERS[f.key] = e.target.value;
@@ -1017,6 +1040,7 @@
     });
     document.getElementById("clearFiltersBtn").addEventListener("click", function(){
       FILTER_FIELDS.forEach(function(f){ FILTERS[f.key] = ""; });
+      SELECTED_MONTH=""; document.getElementById("fMonth").value="";
       render(lastAllRows, lastMeta);
     });
   }
@@ -1673,6 +1697,7 @@
     loadLive();
     if(!notWiredUp) setInterval(loadLive, REFRESH_MS);
     document.getElementById("refreshBtn").addEventListener("click", loadLive);
+    document.querySelectorAll('a[href="#plannerSection"]').forEach(function(a){a.addEventListener("click",function(){document.getElementById("ganttDisclosure").open=true;});});
   }
 
   if(document.readyState === "loading"){
