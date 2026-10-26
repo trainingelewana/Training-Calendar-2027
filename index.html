@@ -614,8 +614,8 @@
   </section>
 
   <section id="oshaTrainingSection">
-    <div class="section-head"><div><p class="eyebrow small">Safety &amp; compliance</p><h2>OSHA Training</h2></div></div>
-    <button type="button" id="oshaTrainingTile" class="department-tile osha-tile" aria-expanded="false" aria-controls="oshaTrainingDetails"><span class="department-tile-title">OSHA Training</span><span class="department-tile-count" id="oshaCount"></span><span class="department-tile-open">View OSHA sessions ▾</span></button>
+    <div class="section-head"><div><p class="eyebrow small">Safety &amp; compliance</p><h2>Compliance Training</h2></div></div>
+    <button type="button" id="oshaTrainingTile" class="department-tile osha-tile" aria-expanded="false" aria-controls="oshaTrainingDetails"><span class="department-tile-title">Compliance Training</span><span class="department-tile-count" id="oshaCount"></span><span class="department-tile-open">View compliance sessions ▾</span></button>
     <div id="oshaTrainingDetails" class="training-detail-area" hidden></div>
   </section>
 
@@ -1273,7 +1273,7 @@
     var open=OPEN_TRAINING_GROUP==="__OSHA__";
     document.getElementById("oshaTrainingTile").setAttribute("aria-expanded",String(open));
     oshaDetails.hidden=!open;
-    if(open)renderTrainingGroup(oshaDetails,osha,"OSHA Training");
+    if(open)renderTrainingGroup(oshaDetails,osha,"Compliance Training");
     else oshaDetails.innerHTML="";
   }
   document.getElementById("oshaTrainingTile").addEventListener("click",function(){
