@@ -1096,6 +1096,11 @@
     }
     note.textContent = "Next " + upcoming.length + " session" + (upcoming.length===1?"":"s") +
       (undated ? " · " + undated + " more awaiting confirmed dates" : "");
+    // Keep exactly two session tiles per row at desktop widths, even if stale CSS survives.
+    list.style.setProperty("display","grid","important");
+    list.style.setProperty("grid-template-columns",
+      window.innerWidth >= 760 ? "repeat(2,minmax(0,1fr))" : "minmax(0,1fr)","important");
+    list.style.setProperty("column-gap","22px","important");
     list.innerHTML = upcoming.map(function(r){
       var dateStr = fmtDate(r.start) + (r.end && r.end.getTime()!==r.start.getTime() ? (" – " + fmtDate(r.end)) : "");
       var statusClass = String(r.status).toLowerCase();
