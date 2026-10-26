@@ -445,6 +445,18 @@
 @media (max-width:759px){
   #upcomingList.upcoming-list{display:grid!important;grid-template-columns:minmax(0,1fr)!important;}
 }
+
+/* Keep Upcoming Training status and registration action on the same line. */
+@media (min-width:760px){
+  #upcomingList .upcoming-row{
+    grid-template-columns:64px minmax(0,1fr) auto auto !important;
+    column-gap:9px !important;
+    align-items:center;
+  }
+  #upcomingList .upcoming-row .u-status{grid-column:3;grid-row:1;justify-self:end;white-space:nowrap;}
+  #upcomingList .upcoming-row .u-action{grid-column:4;grid-row:1;justify-self:end;white-space:nowrap;}
+  #upcomingList .upcoming-row .u-action .btn{width:auto;}
+}
 </style>
 
 <div class="wrap">
