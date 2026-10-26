@@ -1249,18 +1249,18 @@
       (action ? '<a class="btn btn-small" href="'+esc(action.href)+'" target="_blank" rel="noopener">'+esc(action.label)+' ↗</a>' : '')+'</div></article>';
   }
   function hodModuleGroup(r){
-    var text=String(r.area||"")+" "+String(r.department||"");
-    if(!/\\bHOD\\b|heads? of departments?|supervisory module|leadership.*management/i.test(text)) return "";
-    var match=String(r.area||"").match(/\\bmodule\\s*0?([1-8])\\b/i);
-    if(!match) return "";
-    var month=r.start ? r.start.getFullYear()+"-"+String(r.start.getMonth()+1).padStart(2,"0") : "undated";
+    var title=String(r.area||"");
+    var details=[r.property,r.category,r.department,r.notes].map(function(x){return String(x||"");}).join(" ");
+    var match=title.match(/\bmodule\s*0?([1-8])\b/i);
+    if(!match)return "";
+    if(!/\bHOD\b|supervisory programme|department expert to HOD|supervisory program/i.test(title+" "+details))return "";
+    var month=r.start?r.start.getFullYear()+"-"+String(r.start.getMonth()+1).padStart(2,"0"):"undated";
     return match[1]+"|"+month;
   }
   function sopMonthlyGroup(r){
     var title=String(r.area||"");
     var category=String(r.category||"");
-    if(!/\\bSOPs?\\b|standard operating procedure/i.test(title+" "+category))return "";
-    // Recurring online SOP timetable is already excluded by renderTrainingTiles.
+    if(!/\bSOPs?\b|standard operating procedures?/i.test(title+" "+category))return "";
     var month=r.start?r.start.getFullYear()+"-"+String(r.start.getMonth()+1).padStart(2,"0"):"undated";
     return "SOP|"+month;
   }
