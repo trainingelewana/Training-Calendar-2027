@@ -926,7 +926,19 @@
     var sel = norm(selected);
     if(norm(r.property) === sel) return true;
     var part = String(r.participatingProperty || "").trim();
-    if(/^(ALL|ALL PROPERTIES|ALL HODS|ALL CAMPS|ALL LODGES)$/i.test(part)) return true;
+    if(/^(ALL|ALL PROPERTIES|ALL HODS|ALL CAMPS|ALL LODGES)$/i.test(part)){
+      // ALL is country-wide, not automatically Kenya + Tanzania combined.
+      var propertyCountries = {
+        ACL:"Tanzania", TTT:"Tanzania", TMN:"Tanzania", SPC:"Tanzania",
+        SXR:"Tanzania", SMC:"Tanzania", KLZ:"Tanzania", TSL:"Tanzania",
+        SRM:"Kenya", EPC:"Kenya", LEPC:"Kenya", LTC:"Kenya",
+        LLS:"Kenya", LSB:"Kenya", LSC:"Kenya", KHL:"Kenya",
+        TCA:"Kenya", EKM:"Kenya", LKC:"Rwanda"
+      };
+      var selectedCountry = propertyCountries[sel];
+      var sessionCountry = String(r.country || "").trim().toLowerCase();
+      return !!selectedCountry && sessionCountry === selectedCountry.toLowerCase();
+    }
     return part.split(/[,;\/]+/).some(function(p){ return norm(p) === sel; });
   }
   function matchesFilters(r, excludeKey){
