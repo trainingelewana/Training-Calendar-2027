@@ -1246,20 +1246,31 @@
     var month=r.start ? r.start.getFullYear()+"-"+String(r.start.getMonth()+1).padStart(2,"0") : "undated";
     return match[1]+"|"+month;
   }
+  function sopMonthlyGroup(r){
+    var title=String(r.area||"");
+    var category=String(r.category||"");
+    if(!/\\bSOPs?\\b|standard operating procedure/i.test(title+" "+category))return "";
+    // Recurring online SOP timetable is already excluded by renderTrainingTiles.
+    var month=r.start?r.start.getFullYear()+"-"+String(r.start.getMonth()+1).padStart(2,"0"):"undated";
+    return "SOP|"+month;
+  }
   function groupedTrainingCards(rows){
     var sorted=rows.slice().sort(function(a,b){return (a.start||new Date(8640000000000000))-(b.start||new Date(8640000000000000));});
-    var groups={}, items=[];
+    var groups={},items=[];
     sorted.forEach(function(r){
-      var key=hodModuleGroup(r);
+      var hod=hodModuleGroup(r);
+      var key=hod?"HOD|"+hod:sopMonthlyGroup(r);
       if(!key){items.push({rows:[r]});return;}
       if(!groups[key]){groups[key]={rows:[],key:key};items.push(groups[key]);}
       groups[key].rows.push(r);
     });
     return items.map(function(item){
       if(!item.key)return trainingSessionCard(item.rows[0]);
-      var r=item.rows[0],moduleNum=item.key.split("|")[0];
-      var month=r.start ? r.start.toLocaleDateString("en-GB",{month:"long",year:"numeric"}) : "Dates to be confirmed";
-      return '<details class="training-session-card hod-module-card"><summary><span><strong>HOD Module '+esc(moduleNum)+'</strong><span class="session-meta">'+esc(month)+' · '+item.rows.length+' session'+(item.rows.length===1?'':'s')+'</span></span><span class="department-tile-open">View sessions ▾</span></summary>'+
+      var r=item.rows[0],hod=item.key.indexOf("HOD|")===0;
+      var moduleNum=hod?item.key.split("|")[1]:"";
+      var label=hod?"HOD Module "+moduleNum:"SOP Training";
+      var month=r.start?r.start.toLocaleDateString("en-GB",{month:"long",year:"numeric"}):"Dates to be confirmed";
+      return '<details class="training-session-card hod-module-card"><summary><span><strong>'+esc(label)+'</strong><span class="session-meta">'+esc(month)+' · '+item.rows.length+' session'+(item.rows.length===1?'':'s')+'</span></span><span class="department-tile-open">View sessions ▾</span></summary>'+
         '<div class="hod-module-sessions">'+item.rows.map(trainingSessionCard).join("")+'</div></details>';
     }).join("");
   }
