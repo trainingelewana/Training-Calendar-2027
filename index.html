@@ -1219,19 +1219,18 @@
     return /\\bOSHA\\b|occupational safety and health/i.test(String(r.area||"")+" "+String(r.category||""));
   }
   function isOnlineSopTraining(r){
-    // Online SOPs are shown only in the dedicated weekly timetable.
-    // Classify using the full session record, not only the visible course title.
+    // The 2027 live log uses SOP27-xx-xx IDs and "Online – Group SOP Revision".
+    // Source identifiers are stable across snapshot -> live refreshes.
+    var id=String(r.id||"").trim();
+    var host=String(r.property||"").trim();
     var title=String(r.area||"");
     var category=String(r.category||"");
-    var department=String(r.department||"");
-    var location=String(r.property||"");
-    var country=String(r.country||"");
-    var facilitator=String(r.trainer||"");
     var notes=String(r.notes||"");
-    var details=[title,category,department,location,country,facilitator,notes].join(" ");
-    var isSop=/\bSOPs?\b|standard operating procedures?/i.test(details);
-    var online=/\bonline\b|\bvirtual\b|\bwebinar\b|\bremote\b|\bteams\b|\bzoom\b|google meet|\bmeetings?\s+online\b/i.test(details);
-    return isSop && online;
+    if(/^SOP27-/i.test(id))return true;
+    if(/online\s*[–—-]\s*group\s+SOP\s+revision/i.test(host))return true;
+    if(/SOP\s+online\s+revision\s+training/i.test(title))return true;
+    return /\bSOPs?\b|standard operating procedures?/i.test(title+" "+category) &&
+      /\bonline\b|\bvirtual\b|\bwebinar\b|\bzoom\b|\bteams\b|google meet/i.test(host+" "+title+" "+notes);
   }
   function trainingSessionCard(r){
     var dateText = r.start ? fmtDate(r.start)+(r.end && r.end.getTime()!==r.start.getTime() ? " – "+fmtDate(r.end) : "") : "Date to be confirmed";
