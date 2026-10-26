@@ -437,6 +437,14 @@
   .upcoming-row{grid-template-columns:68px minmax(0,1fr) auto;gap:7px;}
   .upcoming-row .u-action{grid-column:2 / -1;justify-self:end;}
 }
+/* Enforce two Upcoming Training cards per row, including ultra-wide embedded views. */
+@media (min-width:760px){
+  #upcomingList.upcoming-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:0 22px!important;}
+  #upcomingList .upcoming-row{min-width:0;}
+}
+@media (max-width:759px){
+  #upcomingList.upcoming-list{display:grid!important;grid-template-columns:minmax(0,1fr)!important;}
+}
 </style>
 
 <div class="wrap">
