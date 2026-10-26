@@ -489,6 +489,27 @@
 .weekly-sop-day{color:var(--text-secondary);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
 .weekly-sop-item strong{color:var(--accent-text);font-size:15px}
 @media(max-width:600px){.weekly-sop-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.weekly-sop-item{padding:9px}.weekly-sop-tile>summary{padding:12px}}
+
+/* Simple card-based calendar presentation. */
+#upcomingSection .card{background:transparent;border:0;box-shadow:none;padding:0!important}
+#upcomingList.upcoming-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+#upcomingList .upcoming-row{border:1px solid var(--border)!important;border-radius:10px;background:var(--surface);padding:14px!important;min-height:116px;display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;grid-template-rows:auto auto auto!important;gap:6px 9px!important;align-items:center}
+#upcomingList .upcoming-row .u-date{grid-column:1/-1;grid-row:1;font-size:12px;color:var(--text-secondary)}
+#upcomingList .upcoming-row .u-date br{display:none}
+#upcomingList .upcoming-row .u-main{grid-column:1/-1;grid-row:2}
+#upcomingList .upcoming-row .u-title{font-size:15px}
+#upcomingList .upcoming-row .u-status{grid-column:2!important;grid-row:3!important;justify-self:end}
+#upcomingList .upcoming-row .u-action{grid-column:3!important;grid-row:3!important;justify-self:end}
+#upcomingList .upcoming-row .u-action .btn{width:auto}
+#upcomingList .upcoming-row .u-date{white-space:normal}
+.weekly-sop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sop-tile{display:flex;flex-direction:column;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px;min-height:78px}
+.sop-day{font-size:12px;color:var(--text-secondary);font-weight:600}
+.sop-tile strong{font-size:14px;color:var(--text-primary)}
+.annual-plan-tile{display:flex!important;align-items:center;justify-content:space-between;gap:14px;padding:17px!important;color:var(--text-primary)!important}
+.annual-plan-tile span:first-child{display:flex;flex-direction:column;gap:4px}
+.annual-plan-tile small{font-size:12px;color:var(--text-secondary);font-weight:400}
+@media(max-width:759px){#upcomingList.upcoming-list,.weekly-sop-grid{grid-template-columns:1fr!important}}
 </style>
 
 <div class="wrap">
@@ -582,6 +603,20 @@
     </details>
   </section>
 
+  <section id="weeklySopSection" class="calendar-tile-section">
+    <div class="section-head"><div><p class="eyebrow small">Recurring online sessions</p><h2>Weekly Online SOP Training</h2></div></div>
+    <div class="weekly-sop-grid">
+      <div class="sop-tile"><span class="sop-day">Monday · 11:00 AM</span><strong>Food &amp; Beverage SOPs</strong></div>
+      <div class="sop-tile"><span class="sop-day">Tuesday · 11:00 AM</span><strong>Housekeeping SOPs</strong></div>
+      <div class="sop-tile"><span class="sop-day">Wednesday · 10:00 AM</span><strong>Spa SOPs</strong></div>
+      <div class="sop-tile"><span class="sop-day">Wednesday · 11:00 AM</span><strong>Front Office SOPs</strong></div>
+      <div class="sop-tile"><span class="sop-day">Thursday · 11:00 AM</span><strong>Garden, Security &amp; Maintenance SOPs</strong></div>
+      <div class="sop-tile"><span class="sop-day">Thursday · 2:00 PM</span><strong>Spa SOPs</strong></div>
+      <div class="sop-tile"><span class="sop-day">Friday · 11:00 AM</span><strong>Accounts &amp; Stores SOPs</strong></div>
+    </div>
+    <p class="legend-note">Recurring weekly SOP timetable · Times shown in East Africa Time (EAT)</p>
+  </section>
+
   <section id="upcomingSection">
     <div class="section-head">
       <div>
@@ -595,7 +630,7 @@
     </div>
   </section>
 
-  <details class="calendar-expand" id="ganttDisclosure"><summary>View full-year Gantt chart</summary>
+  <details class="calendar-expand" id="ganttDisclosure"><summary class="annual-plan-tile"><span><strong>Annual Training Plan</strong><small>View the full 2027 Gantt chart</small></span><span aria-hidden="true">▦</span></summary>
   <section class="planner-section" id="plannerSection">
     <div class="section-head">
       <div>
