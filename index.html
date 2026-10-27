@@ -533,6 +533,10 @@
 .hod-module-card summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none}.hod-module-card summary::-webkit-details-marker{display:none}.hod-module-card summary strong{margin:0 0 5px}.hod-module-sessions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:15px;padding-top:12px;border-top:1px solid var(--border)}.hod-module-sessions .training-session-card{box-shadow:none}
 .calendar-panel-disclosure{margin:18px 0;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:0 18px 12px}.calendar-panel-disclosure>summary{cursor:pointer;display:list-item;padding:18px 6px;font-weight:700;font-size:1.08rem;color:var(--text-primary)}.calendar-panel-disclosure>section{margin:0;padding:0}.calendar-panel-disclosure>section>.section-head{display:none}.calendar-panel-disclosure:not([open]){padding-bottom:0}.calendar-panel-disclosure>summary:hover{color:var(--accent-text)}
 #learningMixSection{display:none!important}
+.department-tile.training-shaded,.training-detail-area.training-shaded,.training-detail-area.training-shaded .training-session-card{background:var(--training-shade);color:#2e2b28;border-color:rgba(46,43,40,.18)}
+.department-tile.training-shaded .department-tile-count,.department-tile.training-shaded .department-tile-open,.training-detail-area.training-shaded .session-meta,.training-detail-area.training-shaded .department-tile-open{color:#514942}
+.training-detail-area.training-shaded .training-session-card .btn{background:#fff9;border-color:#9c8b76;color:#342a20}
+.training-detail-area.training-shaded .training-session-card .status-pill{color:#342a20}
 </style>
 
 <div class="wrap">
@@ -1289,6 +1293,22 @@
     el.innerHTML='<div class="training-detail-head"><h3>'+esc(title)+'</h3><span class="section-note">'+rows.length+' session'+(rows.length===1?'':'s')+'</span></div>'+
       (rows.length?'<div class="training-detail-list">'+groupedTrainingCards(rows)+'</div>':'<p>No matching training sessions for the selected property and month.</p>');
   }
+  function trainingDepartmentColor(name){
+    var n=String(name||"").toLowerCase().replace(/&amp;/g,"&").trim();
+    if(/front office|front desk|reception/.test(n))return "#fce5cd";
+    if(/housekeeping/.test(n))return "#ead1dc";
+    if(/food\s*(?:&|and)\s*beverage|f\s*&\s*b/.test(n))return "#c9daf8";
+    if(/kitchen|culinary|chef/.test(n))return "#fff2cc";
+    if(/spa|wellness/.test(n))return "#d9ead3";
+    if(/guide|wildlife/.test(n))return "#a2c4c9";
+    if(/compliance|osha/.test(n))return "#f4cccc";
+    return "";
+  }
+  function applyTrainingShade(el,name){
+    var color=trainingDepartmentColor(name);
+    if(color){el.style.setProperty("--training-shade",color);el.classList.add("training-shaded");}
+    else{el.style.removeProperty("--training-shade");el.classList.remove("training-shaded");}
+  }
   function renderTrainingTiles(rows){
     var departments={};
     rows.filter(function(r){return !isOshaTraining(r) && !isOnlineSopTraining(r);}).forEach(function(r){
@@ -1303,11 +1323,14 @@
         '<span class="department-tile-title">'+esc(name)+'</span><span class="department-tile-count">'+departments[name].length+' training session'+(departments[name].length===1?'':'s')+'</span>'+
         '<span class="department-tile-open">'+(OPEN_TRAINING_GROUP===name?'Hide training ▴':'View all training ▾')+'</span></button>';
     }).join(''):'<p>No departmental training matches the selected filters.</p>';
+    Array.prototype.forEach.call(tileList.querySelectorAll("[data-training-group]"),function(btn){
+      applyTrainingShade(btn,names[Number(btn.getAttribute("data-training-group"))]);
+    });
     document.getElementById("departmentTrainingNote").textContent=names.length+' departments';
     var details=document.getElementById("departmentTrainingDetails");
     if(departments[OPEN_TRAINING_GROUP]){
-      details.hidden=false;renderTrainingGroup(details,departments[OPEN_TRAINING_GROUP],OPEN_TRAINING_GROUP);
-    }else{details.hidden=true;details.innerHTML="";}
+      details.hidden=false;renderTrainingGroup(details,departments[OPEN_TRAINING_GROUP],OPEN_TRAINING_GROUP);applyTrainingShade(details,OPEN_TRAINING_GROUP);
+    }else{details.hidden=true;details.innerHTML="";applyTrainingShade(details,"");}
     Array.prototype.forEach.call(tileList.querySelectorAll("[data-training-group]"),function(btn){
       btn.addEventListener("click",function(){
         var name=names[Number(btn.getAttribute("data-training-group"))];
@@ -1316,6 +1339,8 @@
       });
     });
     var osha=rows.filter(isOshaTraining);
+    applyTrainingShade(document.getElementById("oshaTrainingTile"),"Compliance");
+    applyTrainingShade(document.getElementById("oshaTrainingDetails"),"Compliance");
     document.getElementById("oshaCount").textContent=osha.length+' training session'+(osha.length===1?'':'s');
     var oshaDetails=document.getElementById("oshaTrainingDetails");
     var open=OPEN_TRAINING_GROUP==="__OSHA__";
