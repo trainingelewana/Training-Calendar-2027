@@ -538,6 +538,15 @@
 .department-tile.training-shaded .department-tile-count,.department-tile.training-shaded .department-tile-open,.training-detail-area.training-shaded .session-meta,.training-detail-area.training-shaded .department-tile-open{color:#514942}
 .training-detail-area.training-shaded .training-session-card .btn{background:#fff9;border-color:#9c8b76;color:#342a20}
 .training-detail-area.training-shaded .training-session-card .status-pill{color:#342a20}
+.training-country-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+.country-training-column{min-width:0}
+.country-training-column h4{margin:0 0 4px;font-size:1rem;font-weight:700;color:var(--text-primary)}
+.country-training-count{font-size:.82rem;color:var(--text-secondary);margin-bottom:12px}
+.country-training-cards{display:flex;flex-direction:column;gap:10px}
+.country-training-cards .training-session-card{min-width:0}
+.country-training-empty{font-size:.85rem;color:var(--text-secondary)}
+.unassigned-training{margin-top:16px}.unassigned-training summary{cursor:pointer;margin-bottom:12px}
+@media(max-width:850px){.training-country-grid{grid-template-columns:1fr}}
 </style>
 
 <div class="wrap">
@@ -1290,9 +1299,34 @@
         '<div class="hod-module-sessions">'+item.rows.map(trainingSessionCard).join("")+'</div></details>';
     }).join("");
   }
+  function sessionCountries(r){
+    var raw=String(r.country||"").toLowerCase();
+    var tokens=raw.split(/[^a-z]+/).filter(Boolean);
+    var found=[];
+    if(tokens.indexOf("kenya")>=0||tokens.indexOf("ke")>=0)found.push("Kenya");
+    if(tokens.indexOf("tanzania")>=0||tokens.indexOf("tz")>=0)found.push("Tanzania");
+    if(tokens.indexOf("rwanda")>=0||tokens.indexOf("rw")>=0)found.push("Rwanda");
+    // Fall back to the known hosting property only when the country field is blank.
+    if(!found.length){
+      var p=String(r.property||"").toUpperCase();
+      if(/\b(EKM|EPC|SRM|LTC|LLS|LSB|LSC|KHL|TCA|LEPC)\b/.test(p))found.push("Kenya");
+      else if(/\b(ACL|TTT|TMN|SPC|SXR|SMC|NXR|KLZ)\b/.test(p))found.push("Tanzania");
+      else if(/\bLKC\b/.test(p))found.push("Rwanda");
+    }
+    return found;
+  }
   function renderTrainingGroup(el, rows, title){
-    el.innerHTML='<div class="training-detail-head"><h3>'+esc(title)+'</h3><span class="section-note">'+rows.length+' session'+(rows.length===1?'':'s')+'</span></div>'+
-      (rows.length?'<div class="training-detail-list">'+groupedTrainingCards(rows)+'</div>':'<p>No matching training sessions for the selected property and month.</p>');
+    var countries=["Kenya","Tanzania","Rwanda"];
+    var columns=countries.map(function(country){
+      var relevant=rows.filter(function(r){return sessionCountries(r).indexOf(country)>=0;});
+      return '<div class="country-training-column"><h4>'+country+'</h4>'+
+        '<div class="country-training-count">'+relevant.length+' session'+(relevant.length===1?'':'s')+'</div>'+
+        (relevant.length?'<div class="country-training-cards">'+groupedTrainingCards(relevant)+'</div>':'<p class="country-training-empty">No sessions for this country.</p>')+'</div>';
+    }).join("");
+    var unassigned=rows.filter(function(r){return sessionCountries(r).length===0;});
+    el.innerHTML='<div class="training-detail-head"><h3>'+esc(title)+'</h3><span class="section-note">'+rows.length+' source session'+(rows.length===1?'':'s')+'</span></div>'+
+      '<div class="training-country-grid">'+columns+'</div>'+
+      (unassigned.length?'<details class="unassigned-training"><summary>Country not specified ('+unassigned.length+')</summary><div class="country-training-cards">'+groupedTrainingCards(unassigned)+'</div></details>':'');
   }
   function trainingDepartmentColor(name){
     var n=String(name||"").toLowerCase().replace(/&amp;/g,"&").trim();
