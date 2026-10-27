@@ -549,6 +549,10 @@
 @media(max-width:850px){.training-country-grid{grid-template-columns:1fr}}
 .hod-training-tile,.training-detail-area.training-shaded .hod-training-tile,.hod-training-tile .training-session-card,.training-detail-area.training-shaded .hod-training-tile .training-session-card{background:#fce5cd!important;color:#2e2b28!important;border-color:rgba(46,43,40,.18)}
 .hod-training-tile .session-meta,.training-detail-area.training-shaded .hod-training-tile .session-meta{color:#514942!important}
+.preopening-training-tile,.training-detail-area.training-shaded .preopening-training-tile{background:#800020!important;color:#fff!important;border-color:#65102a!important}
+.preopening-training-tile strong,.preopening-training-tile .session-meta,.training-detail-area.training-shaded .preopening-training-tile .session-meta{color:#fff!important}
+.preopening-training-tile .btn{background:#fff!important;color:#65102a!important;border-color:#fff!important}
+.preopening-training-tile .status-pill{background:#fff!important;color:#65102a!important}
 </style>
 
 <div class="wrap">
@@ -1259,7 +1263,8 @@
   function trainingSessionCard(r){
     var dateText = r.start ? fmtDate(r.start)+(r.end && r.end.getTime()!==r.start.getTime() ? " – "+fmtDate(r.end) : "") : "Date to be confirmed";
     var action = sessionAction(r);
-    return '<article class="training-session-card"><div class="session-meta">'+esc(dateText)+'</div><strong>'+esc(r.area||r.category||"Training session")+'</strong>'+
+    var preOpening=/pre[\\s-]*opening/i.test(String(r.area||"")+" "+String(r.category||""));
+    return '<article class="training-session-card'+(preOpening?' preopening-training-tile':'')+'"><div class="session-meta">'+esc(dateText)+'</div><strong>'+esc(r.area||r.category||"Training session")+'</strong>'+
       '<div class="session-meta">'+esc(r.property||"")+" · "+esc(r.department||"")+
       (r.participatingProperty ? " · Participants: "+esc(r.participatingProperty) : "")+'</div>'+
       '<div class="training-session-bottom"><span class="status-pill '+esc(String(r.status||"").toLowerCase())+'">'+esc(r.status||"Not specified")+'</span>'+
