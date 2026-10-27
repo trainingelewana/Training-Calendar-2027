@@ -555,6 +555,8 @@
 .preopening-training-tile .status-pill{background:#fff!important;color:#65102a!important}
 .food-safety-compliance-tile,.training-detail-area.training-shaded .food-safety-compliance-tile{background:#f4cccc!important;color:#2e2b28!important;border-color:rgba(46,43,40,.18)!important}
 .food-safety-compliance-tile strong,.food-safety-compliance-tile .session-meta,.training-detail-area.training-shaded .food-safety-compliance-tile .session-meta{color:#2e2b28!important}
+.sustainability-training-tile,.training-detail-area.training-shaded .sustainability-training-tile{background:#b6d7a8!important;color:#2e2b28!important;border-color:rgba(46,43,40,.18)!important}
+.sustainability-training-tile strong,.sustainability-training-tile .session-meta,.training-detail-area.training-shaded .sustainability-training-tile .session-meta{color:#2e2b28!important}
 </style>
 
 <div class="wrap">
@@ -1267,7 +1269,8 @@
     var action = sessionAction(r);
     var preOpening=/pre[\\s-]*opening/i.test(String(r.area||"")+" "+String(r.category||""));
     var foodSafety=/food\\s*safety|food\\s*hygiene|haccp/i.test(String(r.area||"")+" "+String(r.category||""));
-    return '<article class="training-session-card'+(foodSafety?' food-safety-compliance-tile':preOpening?' preopening-training-tile':'')+'"><div class="session-meta">'+esc(dateText)+'</div><strong>'+esc(r.area||r.category||"Training session")+'</strong>'+
+    var sustainability=/\bEMS\b|environmental management|sustainability/i.test(String(r.area||"")+" "+String(r.category||""));
+    return '<article class="training-session-card'+(foodSafety?' food-safety-compliance-tile':preOpening?' preopening-training-tile':sustainability?' sustainability-training-tile':'')+'"><div class="session-meta">'+esc(dateText)+'</div><strong>'+esc(r.area||r.category||"Training session")+'</strong>'+
       '<div class="session-meta">'+esc(r.property||"")+" · "+esc(r.department||"")+
       (r.participatingProperty ? " · Participants: "+esc(r.participatingProperty) : "")+'</div>'+
       '<div class="training-session-bottom"><span class="status-pill '+esc(String(r.status||"").toLowerCase())+'">'+esc(r.status||"Not specified")+'</span>'+
