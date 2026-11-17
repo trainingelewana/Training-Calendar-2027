@@ -1,4 +1,14 @@
 <title>2027 Training Calendar</title>
+<script>
+  // Start at the calendar header, including old bookmarked section links.
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  if (location.hash === "#plannerSection" || location.hash === "#departmentTrainingSection") {
+    history.replaceState(history.state, "", location.pathname + location.search);
+  }
+  window.addEventListener("pageshow", function(){
+    window.scrollTo({top:0,left:0,behavior:"instant"});
+  });
+</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
 
@@ -1964,7 +1974,16 @@
     loadLive();
     if(!notWiredUp) setInterval(loadLive, REFRESH_MS);
     document.getElementById("refreshBtn").addEventListener("click", loadLive);
-    document.querySelectorAll('a[href="#plannerSection"]').forEach(function(a){a.addEventListener("click",function(){document.getElementById("ganttDisclosure").open=true;});});
+    document.querySelectorAll('.quick-actions a[href^="#"]').forEach(function(a){
+      a.addEventListener("click", function(event){
+        var id = a.getAttribute("href").slice(1);
+        var target = document.getElementById(id);
+        if(!target) return;
+        event.preventDefault();
+        if(id === "plannerSection") document.getElementById("ganttDisclosure").open = true;
+        target.scrollIntoView({behavior:"smooth", block:"start"});
+      });
+    });
   }
 
   if(document.readyState === "loading"){
