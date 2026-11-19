@@ -792,25 +792,16 @@
   var WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwOZ7oukbxgUoSsUxDcqWqgu3BY-M9_k21Lnp_6v3heYenAlXlK9uh49Z0kOWeK0mH6/exec";
   var REFRESH_MS = 300000; // 5 minutes
 
-  // "Record attendance" links open Winnie's Google Form pre-filled to the
-  // session's own Session ID, so a GM never has to look one up or type it in.
-  // ATTENDANCE_FORM_ENTRY is the form's internal field ID for the Session ID
-  // question, taken from a pre-filled link Winnie generated (Form -> ⋮ menu
-  // -> Pre-fill form -> type a Session ID -> Get link).
-  var ATTENDANCE_FORM_BASE = "https://docs.google.com/forms/d/e/1FAIpQLScvF6LG-4sg75OgN26hk8DubMOMz5FOYboF4-ca0qyPh6ZkPA/viewform";
-  var ATTENDANCE_FORM_ENTRY = "entry.650248237";
-  function attendanceLink(sessionId){
-    return ATTENDANCE_FORM_BASE + "?usp=pp_url&" + ATTENDANCE_FORM_ENTRY + "=" + encodeURIComponent(sessionId);
+  // Registration is handled by the authenticated production application.
+  // Keep the original Session ID intact, including spaces, for the deep link.
+  var REGISTRATION_APP_BASE = "https://script.google.com/a/macros/elewana.com/s/AKfycbzK_jtyBZXMtRFwe9YAxHcCrvDP55GlMjZPa4ZMJ4LBxcUrL6zTzGrDMRPsAcbiZdlr/exec";
+  function registrationLink(sessionId){
+    return REGISTRATION_APP_BASE + "?sessionId=" + encodeURIComponent(sessionId);
   }
-  // Same pre-filled form/Session ID mechanism as always -- the form itself
-  // captures the team's attendee list for a session (see the sheet's own
-  // Attendance Register tab), whether that's submitted before or after the
-  // session happens, so one consistent "Register team" label is more
-  // honest than pretending it's two different actions.
   function sessionAction(r){
     if(!r.id) return null;
     if(String(r.status || "").toLowerCase() === "cancelled") return null;
-    return {label:"Register team", href:attendanceLink(r.id)};
+    return {label:"Register team", href:registrationLink(r.id)};
   }
 
   var YEAR = 2027;
