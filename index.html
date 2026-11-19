@@ -802,12 +802,15 @@
   }
   function sessionAction(r){
     if(!r.id || /cancel|complete|on hold|replac/i.test(String(r.status || ""))) return null;
-    return {label:r.registrationStatus==="Full"?"Join waitlist":r.registrationStatus==="Open"||!r.registrationStatus?"Register team":"View registration", href:registrationLink(r.id)};
+    if(r.registrationRequired===false||r.registrationStatus==="Not Required") return {label:"View attendance session",href:registrationLink(r.id)};
+    if(r.registrationRequired!==true||!r.registrationStatus||r.registrationStatus==="Review Required"||r.registrationStatus==="Review ID") return null;
+    return {label:r.registrationStatus==="Full"?"Join waitlist":r.registrationStatus==="Open"?"Register team":"View registration", href:registrationLink(r.id)};
   }
   function registrationValue(v){return v===undefined||v===null||v===""?"—":String(v);}
   function registrationCapacity(r){return r.registrationStatus&&r.availablePlaces==="Unlimited"&&(r.registrationLimit===""||r.registrationLimit==null)?"Unlimited":registrationValue(r.registrationLimit);}
   function registrationSummary(r){
-    if(!r.registrationStatus)return '<div class="registration-summary">Registration availability not yet published</div>';
+    if(r.registrationRequired===false||r.registrationStatus==="Not Required")return '<div class="registration-summary"><strong>Not Required</strong> · Attendance only</div>';
+    if(r.registrationRequired!==true||!r.registrationStatus)return '<div class="registration-summary">Registration requirement pending verification</div>';
     return '<div class="registration-summary"><strong>'+esc(r.registrationStatus)+'</strong> · Capacity '+esc(registrationCapacity(r))+
       ' · Registered '+esc(registrationValue(r.registeredAttendees))+' · Seats '+esc(registrationValue(r.availablePlaces))+
       ' · Waiting '+esc(registrationValue(r.waitlistedAttendees))+(r.registrationDeadline?' · Deadline '+esc(r.registrationDeadline):'')+'</div>';
@@ -1017,6 +1020,7 @@
         trainer: r["Trainer / Facilitator"] || "",
         attendeesPlanned: num(r["Attendees Planned"]),
         attendeesTrained: num(r["Attendees Trained"]),
+        registrationRequired: typeof r["Registration Required"]==="boolean"?r["Registration Required"]:null,
         registrationLimit: r["Registration Limit"], registrationDeadline: r["Registration Deadline"],
         registeredAttendees: r["Registered Attendees"], availablePlaces: r["Available Places"],
         waitlistedAttendees: r["Waitlisted Attendees"], registrationStatus: String(r["Registration Status"] || ""),
