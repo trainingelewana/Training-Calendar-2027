@@ -567,6 +567,8 @@
 .food-safety-compliance-tile strong,.food-safety-compliance-tile .session-meta,.training-detail-area.training-shaded .food-safety-compliance-tile .session-meta{color:#2e2b28!important}
 .sustainability-training-tile,.training-detail-area.training-shaded .sustainability-training-tile{background:#b6d7a8!important;color:#2e2b28!important;border-color:rgba(46,43,40,.18)!important}
 .sustainability-training-tile strong,.sustainability-training-tile .session-meta,.training-detail-area.training-shaded .sustainability-training-tile .session-meta{color:#2e2b28!important}
+
+.registration-summary{font-size:11px;line-height:1.45;color:var(--text-secondary);margin:5px 0;overflow-wrap:anywhere}.registration-summary strong{font-size:inherit;color:inherit}
 </style>
 
 <div class="wrap">
@@ -737,7 +739,7 @@
           <thead>
             <tr>
               <th>Hosting venue</th><th>Department</th><th>Category</th><th>Training name</th><th>Dates</th>
-              <th>Trainer</th><th class="num">Attendees</th><th>Status</th><th>Registration / Attendance</th><th>Training brief</th><th>Report</th>
+              <th>Trainer</th><th class="num">Trained / Planned</th><th>Status</th><th class="num">Capacity</th><th class="num">Registered</th><th class="num">Available seats</th><th class="num">Waitlisted</th><th>Registration deadline</th><th>Registration status</th><th>Registration</th><th>Training brief</th><th>Report</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
@@ -799,9 +801,16 @@
     return REGISTRATION_APP_BASE + "?sessionId=" + encodeURIComponent(sessionId);
   }
   function sessionAction(r){
-    if(!r.id) return null;
-    if(String(r.status || "").toLowerCase() === "cancelled") return null;
-    return {label:"Register team", href:registrationLink(r.id)};
+    if(!r.id || /cancel|complete|on hold|replac/i.test(String(r.status || ""))) return null;
+    return {label:r.registrationStatus==="Full"?"Join waitlist":r.registrationStatus==="Open"||!r.registrationStatus?"Register team":"View registration", href:registrationLink(r.id)};
+  }
+  function registrationValue(v){return v===undefined||v===null||v===""?"—":String(v);}
+  function registrationCapacity(r){return r.registrationStatus&&r.availablePlaces==="Unlimited"&&(r.registrationLimit===""||r.registrationLimit==null)?"Unlimited":registrationValue(r.registrationLimit);}
+  function registrationSummary(r){
+    if(!r.registrationStatus)return '<div class="registration-summary">Registration availability not yet published</div>';
+    return '<div class="registration-summary"><strong>'+esc(r.registrationStatus)+'</strong> · Capacity '+esc(registrationCapacity(r))+
+      ' · Registered '+esc(registrationValue(r.registeredAttendees))+' · Seats '+esc(registrationValue(r.availablePlaces))+
+      ' · Waiting '+esc(registrationValue(r.waitlistedAttendees))+(r.registrationDeadline?' · Deadline '+esc(r.registrationDeadline):'')+'</div>';
   }
 
   var YEAR = 2027;
@@ -1008,6 +1017,9 @@
         trainer: r["Trainer / Facilitator"] || "",
         attendeesPlanned: num(r["Attendees Planned"]),
         attendeesTrained: num(r["Attendees Trained"]),
+        registrationLimit: r["Registration Limit"], registrationDeadline: r["Registration Deadline"],
+        registeredAttendees: r["Registered Attendees"], availablePlaces: r["Available Places"],
+        waitlistedAttendees: r["Waitlisted Attendees"], registrationStatus: String(r["Registration Status"] || ""),
         individualHours: num(r["Individual Training Hrs"]),
         totalHours: num(r["Total Training Hrs"]),
         budget: num(r["Budget (USD)"]),
@@ -1274,7 +1286,7 @@
     return '<article class="training-session-card'+(foodSafety?' food-safety-compliance-tile':preOpening?' preopening-training-tile':sustainability?' sustainability-training-tile':'')+'"><div class="session-meta">'+esc(dateText)+'</div><strong>'+esc(r.area||r.category||"Training session")+'</strong>'+
       '<div class="session-meta">'+esc(r.property||"")+" · "+esc(r.department||"")+
       (r.participatingProperty ? " · Participants: "+esc(r.participatingProperty) : "")+'</div>'+
-      '<div class="training-session-bottom"><span class="status-pill '+esc(String(r.status||"").toLowerCase())+'">'+esc(r.status||"Not specified")+'</span>'+
+      registrationSummary(r)+'<div class="training-session-bottom"><span class="status-pill '+esc(String(r.status||"").toLowerCase())+'">'+esc(r.status||"Not specified")+'</span>'+
       (action ? '<a class="btn btn-small" href="'+esc(action.href)+'" target="_blank" rel="noopener">'+esc(action.label)+' ↗</a>' : '')+'</div></article>';
   }
   function hodModuleGroup(r){
@@ -1430,7 +1442,7 @@
       return '<div class="upcoming-row">' +
         '<div class="u-date">' + esc(fmtDate(r.start)).split(" ").join("<br>") + '</div>' +
         '<div class="u-main"><div class="u-title">' + esc(r.area || r.category) + '</div>' +
-        '<div class="u-sub">' + esc(r.property) + (r.participatingProperty ? " · " + esc(r.participatingProperty) : "") + '</div></div>' +
+        '<div class="u-sub">' + esc(r.property) + (r.participatingProperty ? " · " + esc(r.participatingProperty) : "") + '</div>'+registrationSummary(r)+'</div>' +
         '<div class="u-status"><span class="status-pill ' + esc(statusClass) + '">' + esc(r.status) + '</span></div>' +
         '<div class="u-action">' + (action ? '<a class="btn btn-small" href="' + esc(action.href) + '" target="_blank" rel="noopener">' + esc(action.label) + ' &#8599;</a>' : '<span class="muted-cell">&mdash;</span>') + '</div>' +
         '</div>';
@@ -1834,7 +1846,7 @@
         lastMonthKey = monthKey;
         prevRow = null;
         var monthLabel = r.start ? (MONTHS[r.start.getUTCMonth()] + ' ' + r.start.getUTCFullYear()) : 'Dates to be confirmed';
-        sepHtml = '<tr class="month-sep"><td colspan="11">'+esc(monthLabel)+'</td></tr>';
+        sepHtml = '<tr class="month-sep"><td colspan="17">'+esc(monthLabel)+'</td></tr>';
       }
       var sameDept = prevRow && prevRow.department && prevRow.department === r.department ? ' class="repeat-cell"' : '';
       var sameCat = prevRow && prevRow.category && prevRow.category === r.category ? ' class="repeat-cell"' : '';
@@ -1858,6 +1870,12 @@
         '<td>'+(r.trainer ? esc(r.trainer) : '<span class="muted-cell">TBC</span>')+'</td>'+
         '<td class="num">'+attendance+'</td>'+
         '<td><span class="status-pill '+esc(statusClass)+'">'+esc(r.status)+'</span></td>'+
+        '<td class="num">'+esc(registrationCapacity(r))+'</td>'+
+        '<td class="num">'+esc(registrationValue(r.registeredAttendees))+'</td>'+
+        '<td class="num">'+esc(registrationValue(r.availablePlaces))+'</td>'+
+        '<td class="num">'+esc(registrationValue(r.waitlistedAttendees))+'</td>'+
+        '<td>'+esc(registrationValue(r.registrationDeadline))+'</td>'+
+        '<td>'+esc(r.registrationStatus||"Not published")+'</td>'+
         '<td>'+(action ? '<a class="btn btn-small" href="'+esc(action.href)+'" target="_blank" rel="noopener">'+esc(action.label)+' &#8599;</a>' : '<span class="muted-cell">&mdash;</span>')+'</td>'+
         '<td>'+(r.briefLink ? '<a class="btn btn-small" href="'+esc(r.briefLink)+'" target="_blank" rel="noopener">View brief &#8599;</a>' : '<span class="muted-cell">&mdash;</span>')+'</td>'+
         '<td>'+(r.reportLink ? '<a class="btn btn-small" href="'+esc(r.reportLink)+'" target="_blank" rel="noopener">View report &#8599;</a>' : '<span class="muted-cell">&mdash;</span>')+'</td>'+
