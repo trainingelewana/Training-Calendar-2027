@@ -802,13 +802,15 @@
   }
   function sessionAction(r){
     if(!r.id || /cancel|complete|on hold|replac/i.test(String(r.status || ""))) return null;
+    if(r.registrationStatus==="Review Required"||r.registrationStatus==="Review ID") return null;
     if(r.registrationRequired===false||r.registrationStatus==="Not Required") return {label:"View attendance session",href:registrationLink(r.id)};
-    if(r.registrationRequired!==true||!r.registrationStatus||r.registrationStatus==="Review Required"||r.registrationStatus==="Review ID") return null;
+    if(r.registrationRequired!==true||!r.registrationStatus) return null;
     return {label:r.registrationStatus==="Full"?"Join waitlist":r.registrationStatus==="Open"?"Register team":"View registration", href:registrationLink(r.id)};
   }
   function registrationValue(v){return v===undefined||v===null||v===""?"—":String(v);}
   function registrationCapacity(r){return r.registrationStatus&&r.availablePlaces==="Unlimited"&&(r.registrationLimit===""||r.registrationLimit==null)?"Unlimited":registrationValue(r.registrationLimit);}
   function registrationSummary(r){
+    if(r.registrationStatus==="Review Required"||r.registrationStatus==="Review ID")return '<div class="registration-summary"><strong>'+esc(r.registrationStatus)+'</strong> · T&amp;D review required</div>';
     if(r.registrationRequired===false||r.registrationStatus==="Not Required")return '<div class="registration-summary"><strong>Not Required</strong> · Attendance only</div>';
     if(r.registrationRequired!==true||!r.registrationStatus)return '<div class="registration-summary">Registration requirement pending verification</div>';
     return '<div class="registration-summary"><strong>'+esc(r.registrationStatus)+'</strong> · Capacity '+esc(registrationCapacity(r))+
