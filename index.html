@@ -608,7 +608,7 @@
       <select id="fProperty"><option value="">Choose your property</option></select>
     </div>
     <div class="filter-field"><label for="fMonth">Month</label><select id="fMonth"><option value="">All months</option><option value="0">January</option><option value="1">February</option><option value="2">March</option><option value="3">April</option><option value="4">May</option><option value="5">June</option><option value="6">July</option><option value="7">August</option><option value="8">September</option><option value="9">October</option><option value="10">November</option><option value="11">December</option></select></div>
-    <div class="filter-field"><label for="fSessionId">Session code</label><input id="fSessionId" type="search" placeholder="e.g. SSTZ-007" autocomplete="off"></div>
+    <div class="filter-field"><label for="fSessionId">Session code</label><input id="fSessionId" type="search" placeholder="e.g. SSTZ - 007" autocomplete="off"></div>
     <details class="calendar-more-filters"><summary>More filters</summary><div class="calendar-more-grid">
     <div class="filter-field">
       <label for="fCountry">Country</label>
@@ -1097,11 +1097,12 @@
   }
   var SELECTED_MONTH = "";
   var SESSION_QUERY = "";
-  function normalizeSessionCode(value){return String(value||"").replace(/\s+/g,"").toUpperCase();}
-  function sessionCodeLabel(r){return r.id ? '<span class="session-code">'+esc(r.id)+'</span>' : "";}
+  function normalizeSessionCode(value){return String(value||"").replace(/[\s\-\u2010-\u2015\u2212:]+/g,"").toUpperCase();}
+  function displaySessionCode(value){return String(value||"").replace(/\s*([:\-\u2010-\u2015\u2212])\s*/g,function(_,sep){return " "+(sep===":"?":":"-")+" ";}).trim();}
+  function sessionCodeLabel(r){return r.id ? '<span class="session-code">'+esc(displaySessionCode(r.id))+'</span>' : "";}
 
   function matchesFilters(r, excludeKey){
-    if(SESSION_QUERY && normalizeSessionCode(r.id).indexOf(SESSION_QUERY)===-1)return false;
+    if(SESSION_QUERY)return normalizeSessionCode(r.id).indexOf(SESSION_QUERY)!==-1;
     if(SELECTED_MONTH!=="" && (!r.start || r.start.getMonth()!==Number(SELECTED_MONTH))) return false;
     for(var i=0;i<FILTER_FIELDS.length;i++){
       var f = FILTER_FIELDS[i];
@@ -1164,7 +1165,7 @@
   }
 
   function setupFilters(){
-    document.getElementById("fSessionId").addEventListener("input",function(e){SESSION_QUERY=normalizeSessionCode(e.target.value);render(lastAllRows,lastMeta);});
+    document.getElementById("fSessionId").addEventListener("input",function(e){SESSION_QUERY=normalizeSessionCode(e.target.value);if(SESSION_QUERY){FILTER_FIELDS.forEach(function(f){FILTERS[f.key]="";});SELECTED_MONTH="";document.getElementById("fMonth").value="";}render(lastAllRows,lastMeta);});
     document.getElementById("fMonth").addEventListener("change",function(e){SELECTED_MONTH=e.target.value;render(lastAllRows,lastMeta);});
     FILTER_FIELDS.forEach(function(f){
       document.getElementById(f.id).addEventListener("change", function(e){
@@ -1336,7 +1337,7 @@
       var moduleNum=hod?item.key.split("|")[1]:"";
       var label=hod?"HOD Module "+moduleNum:"SOP Training";
       var month=r.start?r.start.toLocaleDateString("en-GB",{month:"long",year:"numeric"}):"Dates to be confirmed";
-      return '<details class="training-session-card hod-module-card'+(hod?' hod-training-tile':'')+'"><summary><span><strong>'+esc(label)+'</strong><span class="session-meta">'+esc(month)+' · '+item.rows.length+' session'+(item.rows.length===1?'':'s')+'</span><span class="session-code">'+esc(item.rows.map(function(s){return s.id;}).filter(Boolean).join(" · "))+'</span></span><span class="department-tile-open">View sessions ▾</span></summary>'+
+      return '<details class="training-session-card hod-module-card'+(hod?' hod-training-tile':'')+'"><summary><span><strong>'+esc(label)+'</strong><span class="session-meta">'+esc(month)+' · '+item.rows.length+' session'+(item.rows.length===1?'':'s')+'</span><span class="session-code">'+esc(item.rows.map(function(s){return displaySessionCode(s.id);}).filter(Boolean).join(" · "))+'</span></span><span class="department-tile-open">View sessions ▾</span></summary>'+
         '<div class="hod-module-sessions">'+item.rows.map(trainingSessionCard).join("")+'</div></details>';
     }).join("");
   }
@@ -1705,7 +1706,7 @@
           var trainingName = uniqueAreas.join(", ");
           var uniqueTrainers = uniqList(s.trainers);
           var uniqueParticipants = uniqList(s.participants);
-          var codes = uniqList(s.ids).join(" · ");
+          var codes = uniqList(s.ids).map(displaySessionCode).join(" · ");
           var label = "<b>" + esc(trainingName) + "</b>" +
             (codes ? "Session: " + esc(codes) + "<br>" : "") +
             "Hosting: " + esc(prop) + "<br>" +
