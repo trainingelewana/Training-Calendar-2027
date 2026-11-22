@@ -569,6 +569,8 @@
 .sustainability-training-tile strong,.sustainability-training-tile .session-meta,.training-detail-area.training-shaded .sustainability-training-tile .session-meta{color:#2e2b28!important}
 
 .registration-summary{font-size:11px;line-height:1.45;color:var(--text-secondary);margin:5px 0;overflow-wrap:anywhere}.registration-summary strong{font-size:inherit;color:inherit}
+.session-code{display:block;font-size:11px;font-weight:700;color:var(--text-secondary);overflow-wrap:anywhere;margin:0 0 4px;letter-spacing:.02em}
+#fSessionId{width:100%;box-sizing:border-box;font:inherit;font-size:13px;padding:7px 9px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-primary)}
 </style>
 
 <div class="wrap">
@@ -606,6 +608,7 @@
       <select id="fProperty"><option value="">Choose your property</option></select>
     </div>
     <div class="filter-field"><label for="fMonth">Month</label><select id="fMonth"><option value="">All months</option><option value="0">January</option><option value="1">February</option><option value="2">March</option><option value="3">April</option><option value="4">May</option><option value="5">June</option><option value="6">July</option><option value="7">August</option><option value="8">September</option><option value="9">October</option><option value="10">November</option><option value="11">December</option></select></div>
+    <div class="filter-field"><label for="fSessionId">Session code</label><input id="fSessionId" type="search" placeholder="e.g. SSTZ-007" autocomplete="off"></div>
     <details class="calendar-more-filters"><summary>More filters</summary><div class="calendar-more-grid">
     <div class="filter-field">
       <label for="fCountry">Country</label>
@@ -1093,7 +1096,12 @@
     return part.split(/[,;\/]+/).some(function(p){ return norm(p) === sel; });
   }
   var SELECTED_MONTH = "";
+  var SESSION_QUERY = "";
+  function normalizeSessionCode(value){return String(value||"").replace(/\s+/g,"").toUpperCase();}
+  function sessionCodeLabel(r){return r.id ? '<span class="session-code">'+esc(r.id)+'</span>' : "";}
+
   function matchesFilters(r, excludeKey){
+    if(SESSION_QUERY && normalizeSessionCode(r.id).indexOf(SESSION_QUERY)===-1)return false;
     if(SELECTED_MONTH!=="" && (!r.start || r.start.getMonth()!==Number(SELECTED_MONTH))) return false;
     for(var i=0;i<FILTER_FIELDS.length;i++){
       var f = FILTER_FIELDS[i];
@@ -1151,11 +1159,12 @@
 
   function renderFilterSummary(total, shown){
     var el = document.getElementById("filterSummary");
-    var anyActive = FILTER_FIELDS.some(function(f){ return FILTERS[f.key]; });
+    var anyActive = !!SESSION_QUERY || SELECTED_MONTH!=="" || FILTER_FIELDS.some(function(f){ return FILTERS[f.key]; });
     el.textContent = anyActive ? ("Showing " + shown + " of " + total + " sessions") : "";
   }
 
   function setupFilters(){
+    document.getElementById("fSessionId").addEventListener("input",function(e){SESSION_QUERY=normalizeSessionCode(e.target.value);render(lastAllRows,lastMeta);});
     document.getElementById("fMonth").addEventListener("change",function(e){SELECTED_MONTH=e.target.value;render(lastAllRows,lastMeta);});
     FILTER_FIELDS.forEach(function(f){
       document.getElementById(f.id).addEventListener("change", function(e){
@@ -1165,7 +1174,7 @@
     });
     document.getElementById("clearFiltersBtn").addEventListener("click", function(){
       FILTER_FIELDS.forEach(function(f){ FILTERS[f.key] = ""; });
-      SELECTED_MONTH=""; document.getElementById("fMonth").value="";
+      SELECTED_MONTH=""; document.getElementById("fMonth").value=""; SESSION_QUERY=""; document.getElementById("fSessionId").value="";
       render(lastAllRows, lastMeta);
     });
   }
@@ -1289,7 +1298,7 @@
     var preOpening=/pre[\\s-]*opening/i.test(String(r.area||"")+" "+String(r.category||""));
     var foodSafety=/food\\s*safety|food\\s*hygiene|haccp/i.test(String(r.area||"")+" "+String(r.category||""));
     var sustainability=/\bEMS\b|environmental management|sustainability/i.test(String(r.area||"")+" "+String(r.category||""));
-    return '<article class="training-session-card'+(foodSafety?' food-safety-compliance-tile':preOpening?' preopening-training-tile':sustainability?' sustainability-training-tile':'')+'"><div class="session-meta">'+esc(dateText)+'</div><strong>'+esc(r.area||r.category||"Training session")+'</strong>'+
+    return '<article class="training-session-card'+(foodSafety?' food-safety-compliance-tile':preOpening?' preopening-training-tile':sustainability?' sustainability-training-tile':'')+'">'+sessionCodeLabel(r)+'<div class="session-meta">'+esc(dateText)+'</div><strong>'+esc(r.area||r.category||"Training session")+'</strong>'+
       '<div class="session-meta">'+esc(r.property||"")+" · "+esc(r.department||"")+
       (r.participatingProperty ? " · Participants: "+esc(r.participatingProperty) : "")+'</div>'+
       registrationSummary(r)+'<div class="training-session-bottom"><span class="status-pill '+esc(String(r.status||"").toLowerCase())+'">'+esc(r.status||"Not specified")+'</span>'+
@@ -1327,7 +1336,7 @@
       var moduleNum=hod?item.key.split("|")[1]:"";
       var label=hod?"HOD Module "+moduleNum:"SOP Training";
       var month=r.start?r.start.toLocaleDateString("en-GB",{month:"long",year:"numeric"}):"Dates to be confirmed";
-      return '<details class="training-session-card hod-module-card'+(hod?' hod-training-tile':'')+'"><summary><span><strong>'+esc(label)+'</strong><span class="session-meta">'+esc(month)+' · '+item.rows.length+' session'+(item.rows.length===1?'':'s')+'</span></span><span class="department-tile-open">View sessions ▾</span></summary>'+
+      return '<details class="training-session-card hod-module-card'+(hod?' hod-training-tile':'')+'"><summary><span><strong>'+esc(label)+'</strong><span class="session-meta">'+esc(month)+' · '+item.rows.length+' session'+(item.rows.length===1?'':'s')+'</span><span class="session-code">'+esc(item.rows.map(function(s){return s.id;}).filter(Boolean).join(" · "))+'</span></span><span class="department-tile-open">View sessions ▾</span></summary>'+
         '<div class="hod-module-sessions">'+item.rows.map(trainingSessionCard).join("")+'</div></details>';
     }).join("");
   }
@@ -1447,7 +1456,7 @@
       var action = sessionAction(r);
       return '<div class="upcoming-row">' +
         '<div class="u-date">' + esc(fmtDate(r.start)).split(" ").join("<br>") + '</div>' +
-        '<div class="u-main"><div class="u-title">' + esc(r.area || r.category) + '</div>' +
+        '<div class="u-main">'+sessionCodeLabel(r)+'<div class="u-title">' + esc(r.area || r.category) + '</div>' +
         '<div class="u-sub">' + esc(r.property) + (r.participatingProperty ? " · " + esc(r.participatingProperty) : "") + '</div>'+registrationSummary(r)+'</div>' +
         '<div class="u-status"><span class="status-pill ' + esc(statusClass) + '">' + esc(r.status) + '</span></div>' +
         '<div class="u-action">' + (action ? '<a class="btn btn-small" href="' + esc(action.href) + '" target="_blank" rel="noopener">' + esc(action.label) + ' &#8599;</a>' : '<span class="muted-cell">&mdash;</span>') + '</div>' +
@@ -1603,9 +1612,10 @@
       var p = byProp[r.property];
       if(r.start < p.earliest) p.earliest = r.start;
       var key = r.start.getTime()+"_"+r.end.getTime();
-      if(!p.segments[key]) p.segments[key] = {start:r.start, end:r.end, areas:[], categories:{}, statuses:{}, openToAll:false, trainers:[], participants:[], attendeesPlanned:0, unresolvedConflict:false, tdConfirmed:false};
+      if(!p.segments[key]) p.segments[key] = {start:r.start, end:r.end, areas:[], ids:[], categories:{}, statuses:{}, openToAll:false, trainers:[], participants:[], attendeesPlanned:0, unresolvedConflict:false, tdConfirmed:false};
       var seg = p.segments[key];
       seg.areas.push(r.area || r.category);
+      if(r.id)seg.ids.push(r.id);
       seg.categories[r.category] = true;
       seg.statuses[r.status || "Planned"] = true;
       if(r.trainer) seg.trainers.push(r.trainer);
@@ -1695,7 +1705,9 @@
           var trainingName = uniqueAreas.join(", ");
           var uniqueTrainers = uniqList(s.trainers);
           var uniqueParticipants = uniqList(s.participants);
+          var codes = uniqList(s.ids).join(" · ");
           var label = "<b>" + esc(trainingName) + "</b>" +
+            (codes ? "Session: " + esc(codes) + "<br>" : "") +
             "Hosting: " + esc(prop) + "<br>" +
             "Participating: " + esc(s.openToAll ? "All properties" : (uniqueParticipants.join(", ") || prop)) + "<br>" +
             "Start: " + esc(fmtDate(s.start)) + "<br>" +
@@ -1712,7 +1724,7 @@
           // start plus its approximate rendered width) so the label is never
           // badly placed even before layout runs; positionBarLabels then
           // corrects it to the bar's *actual* rendered right edge in pixels.
-          var labelHtml = '<div class="bar-label" data-tt="'+label+'" data-idx="'+idx+'" style="left:calc('+left+'% + 18px)">'+esc(truncateLabel(trainingName, 46))+'</div>';
+          var labelHtml = '<div class="bar-label" data-tt="'+label+'" data-idx="'+idx+'" style="left:calc('+left+'% + 18px)">'+esc((codes ? codes + " · " : "") + truncateLabel(trainingName, 46))+'</div>';
           return barHtml + labelHtml;
         }).join("");
         return '<div class="track" style="'+trackGridStyle+'">'+bars+'</div>';
@@ -1871,7 +1883,7 @@
         '<td'+(propTitle?' title="'+esc(propTitle)+'"':'')+'>'+(r.unresolvedConflict?'<span aria-hidden="true">⚠️ </span>':'')+esc(r.property)+tdBadge+'</td>'+
         '<td'+sameDept+'>'+(r.department ? esc(r.department) : '<span class="muted-cell">&mdash;</span>')+'</td>'+
         '<td'+sameCat+'><span class="tag"><span class="cat-swatch" style="background:var('+colorVar+')"></span>'+esc(r.category)+'</span></td>'+
-        '<td>'+esc(r.area)+'</td>'+
+        '<td>'+sessionCodeLabel(r)+esc(r.area)+'</td>'+
         '<td>'+(r.start ? esc(dateStr) : dateStr)+'</td>'+
         '<td>'+(r.trainer ? esc(r.trainer) : '<span class="muted-cell">TBC</span>')+'</td>'+
         '<td class="num">'+attendance+'</td>'+
