@@ -635,6 +635,8 @@
     <span class="section-note" id="filterSummary"></span>
   </div>
 
+  <section id="sessionSearchResults" class="calendar-tile-section" hidden aria-live="polite" style="margin-bottom:16px"></section>
+
   <details class="calendar-panel-disclosure" open id="weeklySopSectionDisclosure"><summary>Weekly Online SOP Training</summary><section id="weeklySopSection" class="calendar-tile-section">
     <div class="section-head"><div><p class="eyebrow small">Recurring online sessions</p><h2>Weekly Online SOP Training</h2></div></div>
     <div class="weekly-sop-grid">
@@ -1190,6 +1192,7 @@
     renderStatus(meta);
     populateFilters(rows);
     var filtered = applyFilters(rows);
+    renderSessionSearchResults(filtered);
     renderTrainingTiles(filtered);
     renderKpis(filtered);
     renderCategories(filtered);
@@ -1279,6 +1282,13 @@
     var fields=[r.area,r.category,r.department].map(function(v){return String(v||"");}).join(" ");
     return /\bOSHA\b|occupational safety and health|\bcompliance\b|\bmandatory\b|\bstatutory\b|\bregulatory\b|first[\s-]*aid|fire[\s-]*(fighting|fighter|marshal|safety|prevention|response)|firefighting|firemarshal/i.test(fields);
   }
+  function renderSessionSearchResults(rows){
+    var el=document.getElementById("sessionSearchResults");
+    el.hidden=!SESSION_QUERY;
+    if(!SESSION_QUERY){el.innerHTML="";return;}
+    var sorted=rows.slice().sort(function(a,b){return (a.start||new Date(8640000000000000))-(b.start||new Date(8640000000000000));});
+    el.innerHTML='<div class="section-head"><h2>Session search results</h2><span class="section-note">'+sorted.length+' matching session'+(sorted.length===1?'':'s')+'</span></div>'+(sorted.length?'<div class="country-training-cards">'+sorted.map(trainingSessionCard).join("")+'</div>':'<p>No sessions match this code. Check the session ID or clear the search.</p>');
+  }
   function isOnlineSopTraining(r){
     // The 2027 live log uses SOP27-xx-xx IDs and "Online – Group SOP Revision".
     // Source identifiers are stable across snapshot -> live refreshes.
@@ -1287,7 +1297,7 @@
     var title=String(r.area||"");
     var category=String(r.category||"");
     var notes=String(r.notes||"");
-    if(/^SOP27-/i.test(id))return true;
+    if(/^SOP27\s*[-\u2010-\u2015\u2212:]/i.test(id))return true;
     if(/online\s*[–—-]\s*group\s+SOP\s+revision/i.test(host))return true;
     if(/SOP\s+online\s+revision\s+training/i.test(title))return true;
     return /\bSOPs?\b|standard operating procedures?/i.test(title+" "+category) &&
