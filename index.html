@@ -557,7 +557,7 @@
 .country-training-empty{font-size:.85rem;color:var(--text-secondary)}
 .unassigned-training{margin-top:16px}.unassigned-training summary{cursor:pointer;margin-bottom:12px}
 @media(max-width:850px){.training-country-grid{grid-template-columns:1fr}}
-.hod-training-tile,.training-detail-area.training-shaded .hod-training-tile,.hod-training-tile .training-session-card,.training-detail-area.training-shaded .hod-training-tile .training-session-card{background:#fce5cd!important;color:#2e2b28!important;border-color:rgba(46,43,40,.18)}
+.hod-training-tile,.training-detail-area.training-shaded .hod-training-tile,.hod-training-tile .training-session-card,.training-detail-area.training-shaded .hod-training-tile .training-session-card{background:#eae2f6!important;color:#2e2b28!important;border-color:rgba(46,43,40,.18)}
 .hod-training-tile .session-meta,.training-detail-area.training-shaded .hod-training-tile .session-meta{color:#514942!important}
 .preopening-training-tile,.training-detail-area.training-shaded .preopening-training-tile{background:#800020!important;color:#fff!important;border-color:#65102a!important}
 .preopening-training-tile strong,.preopening-training-tile .session-meta,.training-detail-area.training-shaded .preopening-training-tile .session-meta{color:#fff!important}
@@ -1385,6 +1385,8 @@
   }
   function trainingDepartmentColor(name){
     var n=String(name||"").toLowerCase().replace(/&amp;/g,"&").trim();
+    if(/security|maintenance|garden/.test(n))return "#fff2cc";
+    if(/management|leadership|supervisory|\bhod\b/.test(n))return "#eae2f6";
     if(/front office|front desk|reception/.test(n))return "#fce5cd";
     if(/housekeeping/.test(n))return "#ead1dc";
     if(/food\s*(?:&|and)\s*beverage|f\s*&\s*b/.test(n))return "#c9daf8";
