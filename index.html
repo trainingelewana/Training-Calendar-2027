@@ -719,10 +719,10 @@
         <div>
           <div id="catDonutWrap"></div>
           <table class="mini-table">
-            <thead><tr><th>Category</th><th class="num">Hours scheduled</th><th class="num">Hours completed</th></tr></thead>
+            <thead><tr><th>Category</th><th class="num">Planned hours (pending)</th><th class="num">Recorded, not approved</th><th class="num">Approved actual hours</th></tr></thead>
             <tbody id="catHoursBody"></tbody>
           </table>
-          <p class="legend-note">Hours = Individual Training Hrs &times; Attendees Planned per session. Sessions missing an attendee count aren't counted yet (flagged above). &ldquo;Completed&rdquo; counts Status = Completed only.</p>
+          <p class="legend-note">Pending planned hours = planned attendees &times; individual hours for active sessions not completed. Recorded, not approved = entered attendees &times; individual hours, shown separately and never counted as approved. Approved actual hours require Status = Completed and recorded attendance. Completed sessions are excluded from pending plans because the master replaces individual planned hours with the approved actual average. On-hold/replaced sessions and UNQ test IDs are excluded from these hour totals. Missing planned counts are flagged.</p>
         </div>
       </div>
     </div>
@@ -1540,40 +1540,53 @@
       '</div>';
   }
 
-  // Total Training Hrs (from the sheet's own Individual Hrs × Attendees
-  // Planned) gives real training-hour totals wherever both figures are
-  // filled in. Sessions still missing an attendee count contribute 0 here
-  // until that's filled in -- surfaced via hoursGap below rather than hidden.
+  // The master replaces Column N with approved average hours after attendance
+  // approval. Therefore historical original planned hours cannot be reliably
+  // reconstructed for Completed sessions from the current master fields.
+  // Do not silently combine planned and actual figures from Column O.
+  function reportingEligible(r){
+    var id=normalizeSessionCode(r.id);
+    var status=String(r.status||"").toLowerCase();
+    return !/^UNQ00[123]$/.test(id) && !/on hold|replaced|cancelled|canceled/.test(status);
+  }
   function computeCategoryHours(rows){
-    var scheduled = {}, completed = {}, gap = {};
+    var planned={}, pending={}, approved={}, gap={};
     rows.forEach(function(r){
-      if(!r.category) return;
-      scheduled[r.category] = (scheduled[r.category]||0) + r.totalHours;
-      if(String(r.status).toLowerCase() === "completed"){
-        completed[r.category] = (completed[r.category]||0) + r.totalHours;
-      }
-      if(r.totalHours === 0 && r.individualHours > 0){
-        gap[r.category] = (gap[r.category]||0) + 1;
+      if(!r.category || !reportingEligible(r))return;
+      var category=r.category;
+      var isApproved=String(r.status||"").trim().toLowerCase()==="completed";
+      var actualPeople=r.attendeesTrained||0;
+      var plannedPeople=r.attendeesPlanned||0;
+      var hrs=r.individualHours||0;
+      planned[category]=planned[category]||0;
+      pending[category]=pending[category]||0;
+      approved[category]=approved[category]||0;
+      gap[category]=gap[category]||0;
+      if(isApproved){
+        if(actualPeople>0 && hrs>0)approved[category]+=actualPeople*hrs;
+      }else{
+        if(plannedPeople>0 && hrs>0)planned[category]+=plannedPeople*hrs;
+        else if(hrs>0 && !plannedPeople)gap[category]++;
+        if(actualPeople>0 && hrs>0)pending[category]+=actualPeople*hrs;
       }
     });
-    return {scheduled: scheduled, completed: completed, gap: gap};
+    return {planned:planned,pending:pending,approved:approved,gap:gap};
   }
 
   function renderCategoryHours(rows){
-    var d = computeCategoryHours(rows);
-    var names = {};
-    Object.keys(d.scheduled).forEach(function(n){ names[n] = true; });
-    Object.keys(d.completed).forEach(function(n){ names[n] = true; });
-    var list = Object.keys(names).sort(function(a,b){ return (d.scheduled[b]||0) - (d.scheduled[a]||0); });
-    var body = document.getElementById("catHoursBody");
+    var d=computeCategoryHours(rows),names={};
+    [d.planned,d.pending,d.approved].forEach(function(obj){Object.keys(obj).forEach(function(n){names[n]=true;});});
+    var list=Object.keys(names).sort(function(a,b){return (d.planned[b]||0)-(d.planned[a]||0);});
+    var body=document.getElementById("catHoursBody");
     if(!list.length){
-      body.innerHTML = '<tr><td colspan="3" class="empty">No sessions logged yet.</td></tr>';
+      body.innerHTML='<tr><td colspan="4" class="empty">No training-hour data yet.</td></tr>';
       return;
     }
-    body.innerHTML = list.map(function(name){
-      var gapCount = d.gap[name] || 0;
-      var gapNote = gapCount ? ' <span class="muted-cell">('+gapCount+' missing attendees)</span>' : '';
-      return '<tr><td>'+esc(name)+gapNote+'</td><td class="num">'+Math.round(d.scheduled[name]||0).toLocaleString()+'</td><td class="num">'+Math.round(d.completed[name]||0).toLocaleString()+'</td></tr>';
+    var fmt=function(n){return Number(n||0).toLocaleString(undefined,{maximumFractionDigits:2});};
+    body.innerHTML=list.map(function(name){
+      var gapCount=d.gap[name]||0;
+      var gapNote=gapCount?' <span class="muted-cell">('+gapCount+' missing planned counts)</span>':'';
+      return '<tr><td>'+esc(name)+gapNote+'</td><td class="num">'+fmt(d.planned[name])+'</td><td class="num">'+fmt(d.pending[name])+'</td><td class="num">'+fmt(d.approved[name])+'</td></tr>';
     }).join("");
   }
 
