@@ -1237,7 +1237,10 @@
     var propCount = Object.keys(properties).length;
     var planned = 0, trained = 0, anyAttendance = false;
     rows.forEach(function(r){
-      planned += r.attendeesPlanned; trained += r.attendeesTrained;
+      planned += r.attendeesPlanned;
+      if(reportingEligible(r) && String(r.status||"").trim().toLowerCase()==="completed"){
+        trained += r.attendeesTrained;
+      }
       if(r.attendeesPlanned || r.attendeesTrained) anyAttendance = true;
     });
 
@@ -1250,8 +1253,8 @@
     var tiles = [
       {label:"Training sessions", value: sessions.toLocaleString(), sub: "Across " + propCount + " hosting " + (propCount===1?"property":"properties")},
       {label:"Planned participants", value: planned.toLocaleString(), sub: "Across scheduled sessions"},
-      {label:"People trained", value: anyAttendance ? trained.toLocaleString() : "—",
-        sub: anyAttendance ? (trained.toLocaleString() + " of " + planned.toLocaleString() + " planned") : "Not yet recorded"},
+      {label:"Approved people trained", value: trained.toLocaleString(),
+        sub: trained ? (trained.toLocaleString() + " completed attendance approvals") : "No approved attendance yet"},
       {label:"Scheduled training hours", value: Math.round(totalHours).toLocaleString(), sub: "Individual hrs \u00d7 attendees planned"},
       {label:"Scheduling reviews required", value: reviewsRequired.toLocaleString(),
         sub: reviewsRequired ? "Unresolved overlaps awaiting T&D review" : "None outstanding", warn: reviewsRequired > 0}
